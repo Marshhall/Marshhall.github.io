@@ -371,17 +371,21 @@ footer {
   margin: 0;
 }
 
-
 .cv-container {
-  height: 90vh;
-  position: relative;
-  margin-bottom: 30px;
+  width: 80%;
+  height: 80vh;
+  max-width: 1200px;
+  margin: 20px auto; /* Add this line to center horizontally */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.cv-container object{
-  width: 80%;
+.cv-container object {
+  width: 100%;
   margin: 20px;
 }
+
 
 .under-construction {
   color: #ffd914;
