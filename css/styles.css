@@ -262,6 +262,7 @@ footer {
   font-size: 1.3rem;
   font-weight: 500;
   color: #272727;
+  font-family: "Montserrat", sans-serif;
   transition: all ease 0.3s;
 }
 
@@ -366,7 +367,9 @@ footer {
 }
 
 .book-section-title {
-  font-size: 1.8rem;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #272727;
   font-family: "Montserrat", sans-serif;
   margin: 0;
 }
@@ -383,6 +386,7 @@ footer {
 
 .cv-container object {
   width: 100%;
+  height: 100%;
   margin: 20px;
 }
 
@@ -390,4 +394,37 @@ footer {
 .under-construction {
   color: #ffd914;
   font-size: 16px;
+}
+
+.bimr-title {
+  width: 50%;
+  max-width: 700px;
+  margin: 20px auto;
+}
+
+.bimr-text-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 0 60px;
+  flex-wrap: wrap;
+  text-indent: 50px;
+}
+
+.bimr-text-container p {
+  color: #3a4846;
+  font-size: 1rem;
+  text-align: justify;
+  margin: 10px 20px;
+  width: 100%;
+  max-width: 1000px;
+}
+
+.bimr-text-container h3 {
+  margin: 20px;
+  width: 100%;
+}
+
+.MathJax {
+  font-size: 1em;
 }

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+        <title>Marçal</title>
+        <link rel="stylesheet" href="../../css/styles.css" />
+        <link rel="icon" href="../../images/favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Merriweather&family=Montserrat&family=Sacramento&display=swap&family=Montserrat:wght@500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>
+            MathJax = {
+              tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+              }
+            };
+        </script>
+    </head>
+
+    <body>
+    <div class="topnav">
+        <a href="../../index.html">Home</a>
+        <a href="../about_me.html">About Me</a>
+        <a class="active" href="../blog.html">Blog</a>
+        <a href="../cv.html">CV</a>
+        <a href="../contact.html">Contact</a>
+    </div>
+    </body>
+
+    <div class="bimr-title">
+        <h2>Transcendental Dynamics: The Complex Exponential Family</h2>
+    </div>
+    <div class="bimr-text-container">
+        <p>
+            During this summer I've had the chance to participate in the Barcelona Introduction
+            to Mathematical Research programme. Here, I have been able to carry out a research
+            project on <em>Transcendental Dynamics</em> involving the complex exponential 
+            family. In this post, I will explain in detail what the project is all about.
+        </p>
+        
+        <h3>Some preliminaries</h3>
+
+        <p>
+            We know that for a function $f: \mathbb{C} \to \mathbb{C}$, the orbit of its critical
+            points and its assymptotic values determine (qualitatively) the dynamics of this
+            function. For instance, $f(z) = e^z$ has no critical points and one assymptotic 
+            value, namely $z = 0$, since taking any curve $\gamma: \mathbb{R} \to \mathbb{R}$ 
+            that tends to $\infty$ such that $\text{Re}(\gamma(t))$ tends to $-\infty$ as
+            $t \to \infty$ will satisfy that $\lim_{t \to \infty} e^{\gamma(t)} = 0$.
+        </p>
+        <p>
+            We will study the complex exponential family, namely $E_{\lambda} (z) := \lambda e^z$,
+            where $\lambda, z \in \mathbb{C}$, for different values of the parameter $\lambda$.
+            We have already seen that this function only has one assymptotic value: $z = 0$. 
+            If we fix $\lambda = 1$, the orbit of the point $z = 0$ is the following:
+
+            $$ 0 \to 1 \to e \to e^e \to e^{e^e} \to \dots $$
+
+            That is, $E_1^n(0)$ goes to $\infty$ as $n$ gets larger and larger. From this we can
+            already conclude that the Julia set of $E_1$ is the entire complex plane: $J(E_1) = \mathbb{C}$.
+        </p>
+
+        <h3>The Problem</h3>
+        <p>
+            We have seen that the dynamics for $\lambda = 1$ are quite dramatic, since we cannot
+            have, for instance, a periodic orbit. What happens now if we change, just a 
+            little bit, the value of the parameter $\lambda$? Will the dynamics be qualitatively
+            the same, <em>i.e.</em> conjugate? Or will we have a completely different behavior?
+        </p>
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+    <footer>
+        <a
+          class="footer-link"
+          href="https://www.linkedin.com/in/mar%C3%A7al-herraiz-bay%C3%B3-249b501b7/"
+          target="_blank"
+          rel="noopener noreferrer"
+          >LinkedIn</a
+        >
+        <a
+          class="footer-link"
+          href="https://github.com/Marshhall"
+          target="_blank"
+          rel="noopener noreferrer"
+          >GitHub</a
+        >
+        <p class="copyright-text">© 2023 Marçal Herraiz</p>
+    </footer>
+</html>
