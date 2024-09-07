@@ -38,10 +38,10 @@ a {
 }
 
 hr {
-  border: dotted #eaf6f6 6px;
+  border: dotted #11999e71 6px;
   border-bottom: none;
-  width: 4%;
-  margin: 100px auto;
+  width: 10%;
+  margin: 40px auto;
 }
 
 footer {
@@ -56,6 +56,57 @@ footer {
   margin-top: auto;
 }
 
+/* Tooltipped element css */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  color: #ff7f7f;
+  font-size: 1.8rem;
+}
+
+/* Tooltip container positioning css */
+.tooltip .tooltiptext {
+  position: absolute;
+  z-index: 1;
+  top: 25%;
+  left: 100%;
+  transform: translate(0, -50%); /* Center the tooltip vertically */
+  margin-left: 15px;
+  opacity: 0;
+  color: #eaf6f6;
+  border-radius: 10px;
+  transition: opacity 0.3s; /* Tooltip animation with CSS */
+  background-color: #555;
+  font-size: 1rem;
+  padding: 5px 10px; /* Add some padding for better spacing */
+
+  display: flex; /* Use flexbox to center the text */
+  align-items: center; /* Vertically center the text */
+  justify-content: center; /* Center the text horizontally */
+
+  white-space: nowrap; /* Prevent the text from wrapping to a new line */
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 50%; /* Vertically center the arrow */
+  left: -10px; /* Position the arrow on the right side, slightly outside the tooltip box */
+  transform: translateY(-50%); /* Adjust position to be perfectly centered */
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent #555 transparent transparent; /* Adjust colors to match the tooltip box */
+}
+
+
+/* Tooltip triggering with css */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+
 .profile-name {
   text-align: center;
   font-family: "Merriweather", serif;
@@ -68,7 +119,42 @@ footer {
   margin: 20px 0 0 50px;
   font-family: "Montserrat", sans-serif;
   color: #4fbebe;
+  float: left;
+  display: inline;
 }
+
+.profile-name a {
+  color: #edaf1d;
+  font-family: "Montserrat", sans-serif;
+  margin: 10px 20px;
+  text-decoration: none;
+  display: inline block;
+  height: 50px;
+  padding: 10px; 
+  background-color: transparent; /*default value, used here to illustrate*/
+}
+
+.profile-name,
+.profile-name .tooltip {
+  display: inline;
+}
+
+.tooltip {
+  display: inline-block;
+}
+
+.profile-pic-container {
+  margin-top: 30px; /* Add some space between the header and the image */
+  text-align: center; /* Center the image */
+}
+
+.profile-pic {
+  display: block; /* Ensures the image is on its own line */
+  margin: 0 auto; /* Center the image horizontally */
+}
+
+
+
 
 .top-container {
   background-color: #e4f9f5;
@@ -106,6 +192,14 @@ footer {
   margin-right: auto;
 }
 
+.about-me-text a {
+  color: #11999e;
+  font-family: "Merriweather", sans-serif;
+  margin: 0;
+  text-decoration: none;
+
+}
+
 .intro {
   width: 40%;
   margin: auto;
@@ -122,8 +216,22 @@ footer {
 
 .skill-row {
   width: 50%;
-  margin: 100px auto;
+  margin: 30px auto;
   text-align: left;
+}
+
+.skill-row img {
+  max-width: 120px;
+  max-height: 120px;
+  border-radius: 10px;
+}
+
+.skill-row h3 {
+  margin: 10px;
+}
+
+.skill-row p {
+  margin: 0;
 }
 
 .profile-pic {
