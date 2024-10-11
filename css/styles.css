@@ -459,22 +459,25 @@ footer {
 
 
 .book-container {
-  display: flex;
+  display: block;
   justify-content: center;
   align-items: center;
-  margin: 20px 0px;
+  margin: 0 auto;
   flex-wrap: wrap;
+  text-align: center;
+  max-width: 1000px;
 }
 
 .book-box {
-  margin: 20px;
+  display: block;
+  margin: 20px 20px 40px 20px;
   width: 100%;
   text-align: center;
   max-width: 1000px;
 }
 
 .book-box a {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: bold;
   font-family: "Merriweather", serif;
   color: #40514e;
@@ -493,10 +496,10 @@ footer {
 
 .book-box p {
   color: #40514e;
-  font-size: 0.9rem;
+  font-size: 1rem;
   text-align: justify;
   margin: 20px;
-  width: 80%;
+  width: 100%;
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
@@ -514,7 +517,7 @@ footer {
   font-weight: 600;
   color: #272727;
   font-family: "Montserrat", sans-serif;
-  margin: 0;
+  margin: 0 20px 20px 20px;
 }
 
 .cv-container {
@@ -546,12 +549,13 @@ footer {
 }
 
 .bimr-text-container {
-  display: flex;
+  display: block;
   justify-content: center;
   align-items: center;
-  padding: 0 0 60px;
+  margin: 0 auto;
   flex-wrap: wrap;
   text-indent: 50px;
+  text-align: center;
 }
 
 .bimr-text-container p {
