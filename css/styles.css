@@ -1059,47 +1059,46 @@ ul {
 }
 
 .award-text {
-  padding: 30px;
+  padding: 20px 30px 30px;
   display: flex;
   flex-direction: column;
-  text-align: left;
-}
-
-.award-text span {
-  color: #66bfbf;
-  font-size: 0.9rem;
+  text-align: justify;
+  word-break: normal;
+  hyphens: auto;
+  -webkit-hyphens:auto;
+  -moz-hyphens:auto;
 }
 
 .award-text .award-title {
-  font-size: 1.3rem;
-  font-weight: 500;
-  color: #272727;
+  font-size: 22px;
+  margin: 0 0 10px;
+  padding: 0;
+  display: block;
   font-family: "Montserrat", sans-serif;
-  transition: all ease 0.3s;
-}
-
-.award-text .award-title:hover {
-  color: #11999e;
-  transition: all ease 0.2s;
+  color: #0f0f0f;
+  text-align: left;
+  margin-bottom: 5px;
 }
 
 .award-text p {
-  color: #9b9b9b;
-  font-size: 0.9rem;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 10;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: 20px 0px;
+  margin: 10px 0px;
+  line-height: 1.6em;
 }
 
 .award-text a {
-  color: #0f0f0f;
+  margin: 0;
+  padding: 0;
+  font-family: "Merriweather", serif;
 }
 
-.award-text a:hover {
-  color: #11999e;
-  transition: all ease 0.3s;
-}
 
+.award-text b{
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.1em;
+  margin: 5px auto 0;
+}
