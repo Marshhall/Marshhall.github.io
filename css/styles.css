@@ -885,6 +885,10 @@ ul {
   font-family: "Merriweather", serif;
 }
 
+.full-desc b {
+  font-family: 'Montserrat', sans-serif;
+}
+
 .awards {
   margin: 10px 0 0 5px;
   line-height: 2em;
