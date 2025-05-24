@@ -786,6 +786,10 @@ ul {
   text-align: left;
 }
 
+.location {
+  text-transform: none;
+}
+
 .toggle-button {
   background-color: #66bfbf; /* Slightly darker blue */
   border: none;
