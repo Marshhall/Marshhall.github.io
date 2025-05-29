@@ -748,24 +748,45 @@ ul {
   margin-bottom: 8px;
 }
 
+.logo-container {
+  max-width: 350px;
+  height: 80px;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* overflow: hidden; */
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 .institution-logo {
-  max-width: 300px; /* Ensures it never exceeds 300px */
-  width: 100%; /* Allows responsiveness */
-  height: auto; /* Maintains original aspect ratio */
-  display: block; /* Prevents inline spacing issues */
+  width: 100%;
+  height: auto;
+  max-width: 300px;
+  object-fit: contain;
+  display: block;
+}
+
+/* .institution-logo {
+  max-width: 300px; 
+  width: 100%; 
+  height: auto; 
+  display: block;
   object-fit: contain;
   border-radius: 5px;
   max-width: 300px;
   margin-bottom: 5px;
   padding: 1px;
-}
+} */
 
-.institution-logo img {
+/* .institution-logo img {
   width: 100%;
   height: 100px;
   vertical-align: middle;
   border-style: none;
-}
+  object-fit: contain;
+} */
 
 .title h2 {
   font-size: 22px;
