@@ -715,7 +715,7 @@ ul {
 
 .expandable-container {
   max-width: 1200px;
-  width: 100%;
+  width: 90%;
   margin: 20px auto;
   background-color: #ffffff;
   border-radius: 10px;
@@ -1027,10 +1027,11 @@ ul {
   align-items: center;
   flex-direction: column;
   padding: 0 40px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  hyphens: auto;
 }
 
-.award-container { 
+.award-container {
+  max-width: 1200px; 
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1060,6 +1061,7 @@ ul {
   border-top-left-radius: 25px;
   border-top-right-radius: 25px;
   box-sizing: border-box;
+  margin: 10px 0;
 }
 
 /* Image inside the container */
@@ -1081,11 +1083,12 @@ ul {
   padding: 20px 30px 30px;
   display: flex;
   flex-direction: column;
-  text-align: justify;
-  word-break: normal;
+  text-align: left;
+  /* word-break: break-all; */
   hyphens: auto;
-  -webkit-hyphens:auto;
-  -moz-hyphens:auto;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
 }
 
 .award-text .award-title {
