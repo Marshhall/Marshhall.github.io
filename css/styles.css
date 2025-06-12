@@ -732,6 +732,8 @@ ul {
 }
 
 .date-logo {
+  width: 100%;
+  max-width: 300px;
   display: flex;
   flex-direction: column; /* Stack elements vertically */
   align-items: center; /* Center align the content */
@@ -749,13 +751,14 @@ ul {
 }
 
 .institution-logo {
-  max-width: 300px; /* Ensures it never exceeds 300px */
-  width: 100%; /* Allows responsiveness */
+  /* max-width: 300px;
+  width: 100%; */
   height: auto; /* Maintains original aspect ratio */
   display: block; /* Prevents inline spacing issues */
   object-fit: contain;
   border-radius: 5px;
   max-width: 300px;
+  max-height: 100px;
   margin-bottom: 5px;
   padding: 1px;
 }
