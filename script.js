@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 // Expand
                 description.style.height = description.scrollHeight + "px"; // Set dynamic height
-                description.style.paddingBottom = "20px";
+                description.style.paddingBottom = "12px";
                 description.classList.add("expanded");
                 this.classList.add("expanded"); // Rotate the button
                 this.textContent = "-"; // Change to "-"

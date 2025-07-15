@@ -846,7 +846,7 @@ ul {
 }
 
 .description p {
-  margin: 0;
+  margin: 0 0 8px; /* Always should add up to 20px with script.js description.style.paddingBottom */
 }
 
 .description a {
@@ -854,7 +854,7 @@ ul {
 }
 
 .description.expanded {
-  padding: 0 20px 10px;
+  padding: 0 20px 0;
   margin: 0;
 }
 
