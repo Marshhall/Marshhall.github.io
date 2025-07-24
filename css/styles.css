@@ -295,6 +295,7 @@ ul {
 .footer-link {
   color: #11999e;
   text-align: center;
+  transition: all ease 0.3s;
 }
 
 .running-img {
@@ -703,7 +704,7 @@ ul {
   color: #ffffff;
   font-size: 16px;
   border-radius: 5px;
-  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+  transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 .download-button:hover {
