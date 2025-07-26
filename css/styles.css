@@ -1127,3 +1127,14 @@ ul {
   font-size: 1.1em;
   margin: 5px auto 0;
 }
+
+.add-info {
+  margin: 5px 0;
+  line-height: 2em;
+  text-align: left;
+}
+
+.add-info-desc b {
+  font-family: 'Montserrat', sans-serif;
+}
+
