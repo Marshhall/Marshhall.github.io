@@ -32,10 +32,20 @@ div {
 }
 
 a {
-  color: #11999e;
+  /* color: #11999e; */
+  color: #33a7b2;
+  text-decoration: none;
   font-family: "Montserrat", sans-serif;
   margin: 10px 20px;
-  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.3s ease-in-out;
+}
+
+a:hover {
+  /* color: #66bfbf; */
+  color: #11999e;
+  background-color: rgba(102, 191, 191, 0.2);
+  transition: all 0.3s ease-in-out;
 }
 
 hr {
@@ -909,15 +919,50 @@ ul {
 }
 
 .full-desc b {
+  color: #333;
   font-family: 'Montserrat', sans-serif;
 }
+
+.thesis-card {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #fafafa;
+  margin: 1.2rem 0 1rem;
+}
+
+.thesis-card p {
+  margin: 0 0 5px;
+  line-height: 1.4;
+}
+
+.thesis-card h3 {
+  font-family: 'Montserrat', sans-serif;
+  margin: 0 0 15px;
+  color: #333;
+}
+
+.thesis-card b {
+  margin: 0 0 2px;
+  padding: 0;
+  font-weight: bold;
+}
+
+.thesis-link {
+  margin: 0;
+}
+
+.slides-link {
+  margin: 10px 15px 0;
+  display: inline-block;
+}
+
 
 .awards {
   margin: 10px 0 0 5px;
   line-height: 2em;
   text-align: left;
 }
-
 
 .awards ul {
   margin: 0 10px 10px 0;
