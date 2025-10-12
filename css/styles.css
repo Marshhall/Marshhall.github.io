@@ -718,6 +718,7 @@ ul {
 }
 
 .download-button:hover {
+  color: #ffffff;
   background-color: #11999e;
   transform: scale(1.05), translate(-50%)
 }
