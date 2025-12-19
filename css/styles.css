@@ -256,13 +256,14 @@ ul {
 
 .skill-row {
   width: 50%;
-  margin: 30px auto;
+  margin: 30px auto 40px;
   text-align: left;
 }
 
 .skill-row img {
-  max-width: 120px;
-  max-height: 120px;
+  margin-top: 10px;
+  max-width: 140px;
+  max-height: 140px;
   border-radius: 10px;
 }
 
