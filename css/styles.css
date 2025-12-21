@@ -386,6 +386,7 @@ ul {
 .topnav a:hover {
   color: #30e3cb;
   transition: all ease 0.3s;
+  background-color: #333;
 }
 
 .topnav a.active {
@@ -428,6 +429,10 @@ ul {
   border-radius: 25px;
 }
 
+.blog-box a:hover {
+  background-color: #ffffff;
+}
+
 .blog-img {
   width: 100%;
   height: auto;
@@ -464,7 +469,7 @@ ul {
 .blog-text .blog-title:hover {
   color: #11999e;
   font-size: 1.5rem;
-  transition: all ease 0.1s;
+  transition: all ease 0.3s;
 }
 
 .blog-text p {
