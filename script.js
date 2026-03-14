@@ -84,4 +84,63 @@ document.addEventListener("DOMContentLoaded", () => {
         bar.style.strokeDashoffset = `${circumference}`; // Initially hide the fill
         circularObserver.observe(bar);
     });
+
+
+    // Intersection Observer for timeline animation
+    const timeline = document.querySelector(".about-horizontal-timeline-single");
+
+    if (timeline) {
+        const timelineItems = timeline.querySelectorAll(".timeline-item");
+
+        // Store final widths and reset them
+        timelineItems.forEach(item => {
+            const targetWidth = item.getAttribute("data-width") || item.style.width;
+            item.setAttribute("data-width", targetWidth);
+            item.style.width = "0";
+        });
+
+        const timelineObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const timelineElement = entry.target;
+
+                    // Sort visually (top → bottom, left → right)
+                    const items = Array.from(timelineElement.querySelectorAll(".timeline-item"))
+                        .sort((a, b) => {
+                            const topA = parseFloat(a.style.top) || 0;
+                            const topB = parseFloat(b.style.top) || 0;
+                            const leftA = parseFloat(a.style.left) || 0;
+                            const leftB = parseFloat(b.style.left) || 0;
+
+                            if (topA !== topB) return topA - topB;
+                            return leftA - leftB;
+                        });
+
+                    // Animate bars sequentially
+                    items.forEach((item, index) => {
+                        const targetWidth = item.getAttribute("data-width");
+
+                        setTimeout(() => {
+                            item.style.width = targetWidth;
+                            item.querySelector(".timeline-item-content").classList.add("visible");
+                        }, 250 * index);
+                    });
+
+                    // Show axis AFTER all bars
+                    const totalDelay = items.length * 250 + 300;
+
+                    setTimeout(() => {
+                        timelineElement.classList.add("timeline-axis-visible");
+                    }, totalDelay);
+
+                    observer.unobserve(timelineElement);
+                }
+            });
+        }, {
+            root: null,
+            threshold: 0.2
+        });
+
+        timelineObserver.observe(timeline);
+    }
 });
