@@ -130,11 +130,18 @@ ul {
 }
 
 
+.profile {
+  width: 100%;
+  margin: 0 auto;
+}
+
 .profile-name {
   text-align: center;
   font-family: "Merriweather", serif;
   color: #4fbebe;
+  margin-bottom: 5px;
 }
+
 
 .cv-name {
   text-align: center;
@@ -188,8 +195,20 @@ ul {
 }
 
 .profile-pic {
-  display: block; /* Ensures the image is on its own line */
-  margin: 0 auto; /* Center the image horizontally */
+  width: 190px;
+  height: 190px;
+  margin: 0 auto;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.skill-row::after {
+  content: "";
+  display: block;
+  clear: both;
 }
 
 
@@ -513,22 +532,38 @@ ul {
 
 
 
+.home-container {
+  width: 100%;
+}
+
+.home-profile {
+  width: 90%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.home-intro-text {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
 .intro {
-  width: 40%;
-  margin: auto;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 18px;
+  text-align: justify;
 }
 
-.pro {
-  text-decoration: underline;
-}
-
-.contact-message {
-  width: 40%;
-  margin: 40px auto 60px;
+.home-skills {
+  width: 90%;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .skill-row {
-  width: 40%;
+  width: 100%;
+  max-width: 800px;
   margin: 30px auto 50px;
   text-align: left;
 }
@@ -805,6 +840,45 @@ ul {
 }
 
 
+.blog-article {
+  width: 90%;
+  max-width: 1000px;
+  margin: 40px auto 60px;
+}
+
+.blog-article-header {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.blog-article-header h1 {
+  font-family: "Montserrat", sans-serif;
+  font-size: 2.4rem;
+  color: #2b2b2b;
+}
+
+.blog-article-content {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: justify;
+}
+
+.blog-article-content p {
+  line-height: 1.9;
+  margin: 18px 0;
+}
+
+.blog-article-content h3 {
+  margin-top: 40px;
+  margin-bottom: 10px;
+  font-size: 2rem;
+  font-weight: 600;
+  font-family: "Montserrat", sans-serif;
+}
+
+
+
 .book-container {
   display: block;
   justify-content: center;
@@ -868,7 +942,6 @@ ul {
 .book-section-title {
   font-size: 2rem;
   font-weight: 600;
-  color: #272727;
   font-family: "Montserrat", sans-serif;
   margin: 0 20px 20px 20px;
 }
