@@ -143,6 +143,171 @@ ul {
 }
 
 
+/* ═══════════════════════════════════════════
+   SPHERICAL COW SECTION
+   Append this to the bottom of css/styles.css
+════════════════════════════════════════════ */
+
+.cow-section {
+  margin: 10px auto 20px;
+  padding: 0 20px 30px;
+  max-width: 800px;
+}
+
+.cow-header {
+  margin-bottom: 10px;
+}
+
+.cow-title {
+  /* reuses the site's h2 style — no override needed */
+  margin-bottom: 6px;
+}
+
+.cow-subtitle {
+  color: #40514e;
+  font-size: 0.95rem;
+  margin: 0 auto 16px;
+  width: 80%;
+  max-width: 800px;
+  line-height: 1.7;
+}
+
+/* Dark canvas stage */
+.cow-stage {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0px 5px 25px 0px rgba(0, 0, 0, 0.2);
+}
+
+#cow-canvas {
+  display: block;
+  width: 100%;
+  /* height is set by JS to keep it square-ish */
+}
+
+/* Floating label inside the canvas */
+.cow-overlay-text {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(17, 100, 105, 0.60);
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  white-space: nowrap;
+}
+
+/* Controls below the canvas */
+.cow-controls {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.cow-btn {
+  background: linear-gradient(135deg, #11cdd4, #11999e);
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 11px 28px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+  box-shadow: 0 3px 14px rgba(17, 153, 158, 0.30);
+}
+
+.cow-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(17, 153, 158, 0.40);
+  background: linear-gradient(135deg, #30e3cb, #11cdd4);
+}
+
+.cow-btn:active {
+  transform: translateY(0);
+}
+
+.cow-caption {
+  font-size: 0.82rem;
+  color: #40514e;
+  opacity: 0.75;
+  margin: 0;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* Expandable explanation */
+.cow-explanation {
+  margin-top: 20px;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1.5px solid #c8e9e9;
+  border-radius: 10px;
+  padding: 0;
+  font-family: "Merriweather", serif;
+  color: #40514e;
+  text-align: left;
+  background: #f4fdfd;
+}
+
+.cow-explanation summary {
+  cursor: pointer;
+  padding: 12px 18px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #11999e;
+  list-style: none; /* remove default arrow in some browsers */
+  user-select: none;
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.cow-explanation summary::-webkit-details-marker { display: none; }
+
+.cow-explanation summary::before {
+  content: "▸ ";
+  transition: transform 0.2s;
+}
+
+.cow-explanation[open] summary::before {
+  content: "▾ ";
+}
+
+.cow-explanation summary:hover {
+  background: #e4f9f5;
+}
+
+.cow-explanation p {
+  margin: 0;
+  padding: 0 18px 14px;
+  font-size: 0.88rem;
+  line-height: 1.85;
+  color: #40514e;
+  width: auto;
+}
+
+.cow-explanation p + p {
+  padding-top: 0;
+}
+
+
+
 .cv-name {
   text-align: center;
   font-family: "Merriweather", serif;

@@ -49,6 +49,43 @@
 
     <hr />
 
+    <!-- SPHERICAL COW SECTION -->
+    <div class="cow-section">
+      <div class="cow-header">
+        <h2 class="cow-title">Choose Your Player</h2>
+        <p class="cow-subtitle">
+          A physicist's favourite approximation — and a perfectly reasonable thing to do.
+        </p>
+      </div>
+
+      <div class="cow-stage">
+        <canvas id="cow-canvas"></canvas>
+        <div class="cow-overlay-text" id="cow-label">A cow</div>
+      </div>
+
+      <div class="cow-controls">
+        <button class="cow-btn" id="cow-morph-btn">Spherify 🐄 → 🔵</button>
+        <p class="cow-caption" id="cow-caption">Click the button and watch physics take over.</p>
+      </div>
+
+      <details class="cow-explanation">
+        <summary>What is this?</summary>
+        <p>
+          "Assume a spherical cow" is a beloved joke about how physicists simplify problems
+          to make the maths tractable. The punchline: a farmer asks a physicist to help
+          increase milk yield. The physicist thinks hard, then begins —
+          <em>"Consider a spherical cow of uniform density, in a vacuum…"</em>
+        </p>
+        <p>
+          It gently mocks the way theoretical physics strips away messy reality in favour
+          of elegant, solvable models. In practice though, these approximations
+          are extraordinarily powerful. Much of modern physics was built on them.
+        </p>
+      </details>
+    </div>
+
+    <hr />
+
     <div class="skills home-skills">
       <h2>Things I enjoy doing</h2>
 
@@ -80,6 +117,8 @@
     <a class="footer-link" href="https://github.com/Marshhall" target="_blank" rel="noopener noreferrer">GitHub</a>
     <p class="copyright-text">© 2026 Marçal Herraiz</p>
   </footer>
+
+  <script src="cow.js"></script>
 </body>
 
 </html>
