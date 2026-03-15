@@ -49,12 +49,12 @@
 
     <hr />
 
-    <!-- SPHERICAL COW SECTION -->
+    <!-- SPHERICAL COW -->
     <div class="cow-section">
       <div class="cow-header">
-        <h2 class="cow-title">Choose Your Player</h2>
+        <h2 class="cow-title">A Cow, Two Ways</h2>
         <p class="cow-subtitle">
-          A physicist's favourite approximation — and a perfectly reasonable thing to do.
+          How physicists and mathematicians see a cow
         </p>
       </div>
 
@@ -63,25 +63,50 @@
         <div class="cow-overlay-text" id="cow-label">A cow</div>
       </div>
 
+      <!-- BUTTONS -->
       <div class="cow-controls">
-        <button class="cow-btn" id="cow-morph-btn">Spherify &#x1F404 &#x2192 &#127757</button>
-        <p class="cow-caption" id="cow-caption">Click the button and watch physics take over.</p>
+        <div class="cow-btn-group">
+          <button class="cow-btn" id="cow-morph-btn">Spherify &#x1F404 &#x2192 &#127757</button>
+          <p class="cow-caption" id="cow-caption">Click to watch physics take over.</p>
+        </div>
+        <div class="cow-btn-group">
+          <button class="cow-btn cow-btn--tori" id="cow-tori-btn">Genus-3-ify &#x1F404 &#x2192 &#x1f369&#x1f369&#x1f369</button>
+          <p class="cow-caption" id="cow-tori-caption">Click for some topology.</p>
+        </div>
       </div>
 
-      <details class="cow-explanation">
-        <summary>What is this?</summary>
-        <p>
-          "Assume a spherical cow" is a beloved joke about how physicists simplify problems
-          to make the maths tractable. The punchline: a farmer asks a physicist to help
-          increase milk yield. The physicist thinks hard, then begins —
-          <em>"Consider a spherical cow of uniform density, in a vacuum…"</em>
-        </p>
-        <p>
-          It gently mocks the way theoretical physics strips away messy reality in favour
-          of elegant, solvable models. In practice though, these approximations
-          are extraordinarily powerful. Much of modern physics was built on them.
-        </p>
-      </details>
+      <!-- EXPLANATION -->
+      <div class="expandable-container cow-expandable" id="cow-canvas">
+        <div class="cow-explanation-header">
+          <span class="cow-explanation-title">What is this?</span>
+          <button class="toggle-button" type="button">+</button>
+        </div>
+
+        <div class="description cow-explanation-body">
+          <p>
+            "Assume a spherical cow" is one of the classic jokes in physics.
+            The story goes that a farmer asks a physicist to help improve milk production.
+            The physicist disappears for weeks and finally returns with a solution:
+            <em>"Consider a spherical cow of uniform density, in a vacuum..."</em>
+          </p>
+          <p>
+            The joke gently mocks the way theoretical physics often replaces messy reality
+            with simple, elegant models. In truth, these approximations are incredibly powerful:
+            much of modern physics has been built on them.
+          </p>
+          <p>
+            A mathematician might see the cow differently. To them, a cow has a mouth,
+            two nostrils, and, well… one more opening at the other end. In topology,
+            that makes it equivalent to a sphere with three handles
+            (or, if you prefer, three conjoined doughnuts).
+          </p>
+          <p>
+            Both the physicist and the mathematician are right in their own way.
+            The physicist simplified the cow, while the mathematician counted every hole.
+            Even that one. They simply disagree on which parts of the cow are worth keeping.
+          </p>
+        </div>
+      </div>
     </div>
 
     <hr />
@@ -118,6 +143,7 @@
     <p class="copyright-text">© 2026 Marçal Herraiz</p>
   </footer>
 
+  <script src="script.js"></script>
   <script src="cow.js"></script>
 </body>
 

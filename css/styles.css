@@ -211,9 +211,21 @@ ul {
 .cow-controls {
   margin-top: 18px;
   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.cow-btn-group {
+  display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex: 1 1 0;          /* both groups grow equally from 0 */
+  min-width: 0;         /* allow shrinking below content size */
+  max-width: 300px;     /* raised ceiling */
 }
 
 .cow-btn {
@@ -248,62 +260,51 @@ ul {
   margin: 0;
   font-style: italic;
   line-height: 1.5;
+  text-align: center;
 }
 
-/* Expandable explanation */
-.cow-explanation {
-  margin-top: 20px;
+#cow-canvas {
+  width: 100%;
   max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  border: 1.5px solid #c8e9e9;
-  border-radius: 10px;
-  padding: 0;
-  font-family: "Merriweather", serif;
-  color: #40514e;
-  text-align: left;
-  background: #f4fdfd;
 }
 
-.cow-explanation summary {
-  cursor: pointer;
+.cow-explanation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 12px 18px;
+  background: #ffffff;
+}
+
+.cow-explanation-title {
   font-family: "Montserrat", sans-serif;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #11999e;
-  list-style: none; /* remove default arrow in some browsers */
-  user-select: none;
-  border-radius: 10px;
-  transition: background 0.2s;
+  text-align: left;
 }
 
-.cow-explanation summary::-webkit-details-marker { display: none; }
-
-.cow-explanation summary::before {
-  content: "▸ ";
-  transition: transform 0.2s;
+.cow-expandable .toggle-button {
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  flex-shrink: 0;
 }
 
-.cow-explanation[open] summary::before {
-  content: "▾ ";
-}
-
-.cow-explanation summary:hover {
-  background: #e4f9f5;
-}
-
-.cow-explanation p {
-  margin: 0;
-  padding: 0 18px 14px;
-  font-size: 0.88rem;
-  line-height: 1.85;
+.cow-explanation-body {
+  background: #ffffff;
   color: #40514e;
-  width: auto;
+  text-align: left;
 }
 
-.cow-explanation p + p {
-  padding-top: 0;
+.cow-explanation-body p {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  line-height: 1.85;
+}
+
+.cow-explanation-body p:last-child {
+  margin-bottom: 0;
 }
 
 
