@@ -149,8 +149,8 @@ ul {
 ════════════════════════════════════════════ */
 
 .cow-section {
-  margin: 10px auto 20px;
-  padding: 0 20px 30px;
+  margin: 10px auto 0px;
+  padding: 0 20px 10px;
   max-width: 800px;
 }
 
@@ -266,6 +266,9 @@ ul {
 #cow-canvas {
   width: 100%;
   max-width: 800px;
+  margin-top: 30px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
 }
 
 .cow-explanation-header {
