@@ -112,7 +112,7 @@
     for (let i = 0; i < n; i++) {
       const phi = Math.acos(1 - 2 * (i + 0.5) / n);
       const theta = gr * (i + 0.5);
-      pts.push({ x: R * Math.sin(phi) * Math.cos(theta), y: R * Math.sin(phi) * Math.sin(theta), z: R * Math.cos(phi), isEdge: false });
+      pts.push({ x: R * Math.sin(phi) * Math.cos(theta), y: R * Math.sin(phi) * Math.sin(theta)-20, z: R * Math.cos(phi), isEdge: false });
     }
     return pts;
   }
@@ -131,13 +131,13 @@
   // Distance² from (x,y,z) to that nearest circle point:
   //   ((x0 + (x-x0)/r) - x)² + (y/r - y)² + z²
   //
-  // Each torus: major radius R=1, tube radius sqrt(0.5)≈0.707, centred at (x0,0,0).
+  // Each torus: major radius R, tube radius, centred at (, , ).
   // We parametrise directly and keep only the "Voronoi" part closest to each centre.
 
   function genus3(n, scale) {
     const X0S = [-3, 0, 3];
     const R   = 1.5;      // major radius of each torus spine circle
-    const r   = 0.50;  // tube radius = sqrt(0.5)
+    const r   = 0.50;     // tube radius
 
     // Squared distance from point to spine circle of torus k
     function spineD2(x, y, z, k) {
@@ -193,7 +193,7 @@
     for (let i = 0; i < n; i++) {
       const [mx, my, mz] = pts[i % pts.length];
       // Math-X (chain axis) → our X, Math-Z (vertical) → our Y, Math-Y (depth) → our Z
-      out.push({ x: mx * s, y: mz * s, z: my * s, isEdge: false });
+      out.push({ x: mx * s, y: mz * s-25, z: my * s, isEdge: false });
     }
     return out;
   }
