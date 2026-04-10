@@ -204,7 +204,7 @@ ul {
 
 /* Controls below the canvas */
 .cow-controls {
-  margin-top: 18px;
+  margin-top: 30px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
