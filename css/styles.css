@@ -234,7 +234,7 @@ ul {
   letter-spacing: 0.03em;
   padding: 11px 28px;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+  transition: transform 0.6s ease, box-shadow 0.3s ease, background 0.3s ease;
   box-shadow: 0 3px 14px rgba(17, 153, 158, 0.30);
 }
 
@@ -243,12 +243,12 @@ ul {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(17, 153, 158, 0.40);
   background: linear-gradient(135deg, #30e3cb, #11cdd4);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+  transition: transform 0.6s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
 .cow-btn:active {
   transform: translateY(0);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+  transition: transform 0.6s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
 .cow-caption {
