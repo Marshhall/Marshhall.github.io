@@ -643,8 +643,8 @@ ul {
   position: absolute;
   left: 0;
   bottom: 28px;
-  width: 220px;
-  max-width: 220px;
+  width: 260px;
+  max-width: 260px;
   text-align: left;
   opacity: 0;
   transform: translateY(12px);
