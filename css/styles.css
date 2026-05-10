@@ -51,7 +51,7 @@ a:hover {
 hr {
   border: dotted #11999e71 6px;
   border-bottom: none;
-  width: 10%;
+  width: 10vw;
   margin: 40px auto;
 }
 
@@ -1102,7 +1102,6 @@ ul {
 .book-container hr{
   border: dotted #11999e71 6px;
   border-bottom: none;
-  width: 50%;
   margin: 60px auto;
 }
 
