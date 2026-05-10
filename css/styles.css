@@ -990,12 +990,13 @@ ul {
     width: 300px;
   }
 }
-@media (max_width: 1100px) {
+
+@media (max-width: 1100px) {
   .blog-box {
     width: 70%;
   }
 }
-@media (max_width: 550px) {
+@media (max-width: 550px) {
   .blog-box {
     margin: 20px 10px;
     width: 100%;
@@ -1111,6 +1112,108 @@ ul {
   font-family: "Montserrat", sans-serif;
   margin: 0 20px 20px 20px;
 }
+
+
+/* Riemann--Hilbert blog article additions */
+
+.blog-figure-right {
+  float: right;
+  width: 38%;
+  max-width: 320px;
+  margin: 8px 0 20px 28px;
+  text-align: center;
+}
+
+.blog-figure-right img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  border-radius: 10px;
+  background-color: #ffffff;
+}
+
+.blog-figure-right figcaption {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #40514e;
+  font-style: italic;
+  text-align: center;
+}
+
+.theorem-box {
+  clear: both;
+  width: 90%;
+  max-width: 760px;
+  margin: 28px auto;
+  padding: 18px 24px;
+  background-color: #ffffff;
+  border-left: 6px solid #66bfbf;
+  border-radius: 10px;
+  box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.12);
+  text-align: left;
+}
+
+.theorem-box h4 {
+  margin: 0 0 10px;
+  font-family: "Montserrat", sans-serif;
+  color: #11999e;
+  font-size: 1.1rem;
+}
+
+.theorem-box p {
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  text-align: justify;
+}
+
+.math-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  text-align: center !important;
+  margin: 24px auto !important;
+  padding: 6px 0;
+}
+
+.math-display mjx-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+
+/* Clear floated figures inside each article box */
+.book-box::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+
+@media (max-width: 768px) {
+  .blog-figure-right {
+    float: none;
+    width: 90%;
+    max-width: 420px;
+    margin: 20px auto;
+  }
+
+  .theorem-box {
+    width: 86%;
+    padding: 16px 18px;
+  }
+
+  .blog-article-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .blog-article-content h3,
+  .book-section-title {
+    font-size: 1.6rem;
+  }
+}
+
 
 .cv-container {
   width: 80%;

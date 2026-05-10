@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Riemann&ndash;Hilbert Correspondence</title>
+    <link rel="stylesheet" href="../../css/styles.css" />
+    <link rel="icon" href="../../images/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Merriweather&family=Montserrat&family=Sacramento&display=swap&family=Montserrat:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- MathJax for LaTeX-style mathematics -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          macros: {
+            R: '\\mathbb{R}',
+            S: '\\mathbb{S}',
+            T: '\\mathbb{T}',
+            piOne: ['\\pi_1(#1)', 1],
+            Hom: ['\\mathrm{Hom}(#1)', 1],
+            hol: ['\\mathrm{hol}_{#2}^{#3}(#1)', 3],
+            Hol: ['\\mathrm{Hol}_{#2}(#1)', 2],
+            PT: ['\\mathrm{PT}_{#1}', 1],
+            g: '\\mathfrak{g}',
+            d: '\\boldsymbol{\\mathrm{d}}',
+            OmegaForms: ['\\Omega^{#1}(#2)', 2],
+            Hspace: ['\\mathcal{H}_{#1}', 1]
+          }
+        }
+      };
+    </script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
+  </head>
+
+  <body>
+    <div class="topnav">
+      <a href="../../index.html">Home</a>
+      <a href="../about_me.html">About Me</a>
+      <a class="active" href="../blog.html">Blog</a>
+      <a href="../cv.html">CV</a>
+      <a href="../contact.html">Contact</a>
+    </div>
+
+    <div class="blog-article">
+      <!-- HEADER -->
+      <div class="blog-article-header">
+        <h1>Loops, Bundles, and Hidden Symmetries</h1>
+        <h4>A summary of my Bachelor's thesis in Mathematics</h4>
+        </div>
+
+      <div class="blog-article-content">
+        <div class="book-container">
+          <div class="book-box">
+            <h3 class="book-section-title">Introduction</h3>
+            <p>
+              This post is a short summary of my Bachelor's thesis in Mathematics, where I studied a geometric version of the Riemann&ndash;Hilbert correspondence. The main idea is that some geometric objects, namely principal bundles with flat connections, can be closely related to topological and algebraic objects: representations of the fundamental group. You can find the full thesis <a class="thesis-link" href="https://diposit.ub.edu/items/a0346e0c-b593-4327-a7bd-9511663d499b" target="_blank" rel="noopener noreferrer">here</a>. My supervisor was Dr. Ignasi Mundet i Riera (UB&ndash;CRM).
+            </p>
+            
+            <p>
+              The Riemann&ndash;Hilbert correspondence is a central result at the intersection of differential geometry and algebraic topology. In its classical analytic form, it establishes a relationship between linear differential equations with regular singularities and representations of the fundamental group. Modern formulations in differential geometry reinterpret this correspondence as an equivalence between flat connections on principal $G$-bundles over a smooth manifold $M$ and representations of its fundamental group into $G$, modulo conjugation.
+            </p>
+
+            <p>
+              In this project, we develop a geometric exposition of this equivalence by following the conceptual path
+            </p>
+
+            <p class="math-display">
+              $$
+                \text{Flat connections}
+                \longleftrightarrow
+                \text{Holonomy}
+                \longleftrightarrow
+                \text{Representations of the fundamental group}.
+              $$
+            </p>
+            <!-- TODO: add roadmap figure-->
+          </div>
+        </div>
+
+        <hr />
+
+        <h3 class="book-section-title">Preliminaries</h3>
+        <div class="book-container">
+          <div class="book-box">
+            <figure class="blog-figure-right">
+              <img src="../../images/tfgm/principal_bundle.png" alt="Local description of a principal G-bundle" />
+              <figcaption>Local description of a principal $G$-bundle.</figcaption>
+            </figure>
+
+            <p>
+              To begin developing this correspondence, we first need to introduce the mathematical structure that describes continuous symmetries: <strong>Lie groups</strong>. These objects are smooth manifolds equipped with a group structure whose multiplication and inversion operations are differentiable. It is therefore no surprise that they are ubiquitous in modern differential geometry and mathematical physics, where they provide the natural framework for describing how the symmetries of a space vary differentiably along its geometry.
+            </p>
+
+            <p>
+              This idea of assigning the relevant symmetries to each point of a manifold leads naturally to the notion of a <strong>principal bundle</strong>. Given a Lie group $G$, a principal $G$-bundle $\pi\colon P \to M$ is a space that is locally diffeomorphic to a product $U \times G$, where $U \subset M$, but which may globally have richer topology, with twists that are invisible at the local level. At the same time, $G$ acts on $P$ on the right in a differentiable, free, $G$-equivariant way, preserving the fibers.
+            </p>
+          </div>
+
+          <div class="book-box">
+            <figure class="blog-figure-right">
+              <img src="../../images/tfgm/ehres_connection.png" alt="Horizontality determined by a connection form" />
+              <figcaption>Horizontality determined by $\omega$.</figcaption>
+            </figure>
+
+            <p>
+              Once this structure has been defined, a natural question arises: how can we compare fibers lying over different points of the base manifold? The answer is the notion of a <strong>connection</strong>: a $1$-form $\omega \in \Omega^1(P,\mathfrak{g})$ that allows us to distinguish horizontal directions in $P$ as a complement to the natural vertical directions given by $\ker d\pi$. This connection gives rise to the decomposition
+            </p>
+
+            <p class="math-display">
+              $$
+                T_pP = \mathcal{H}_p \oplus \ker d_p\pi,
+              $$
+            </p>
+
+            <p>
+              where $\mathcal{H}_p := \ker \omega_p$ is the horizontal subspace at $p \in P$. This decomposition, compatible with the action of $G$, makes it possible to find the horizontal lift of a curve in the base manifold $M$.
+            </p>
+
+            <div class="theorem-box">
+              <h4>Theorem</h4>
+              <p>
+                For every piecewise differentiable curve $\gamma\colon I \to M$ and every initial point $p \in P_{\gamma(0)}$, there exists a unique horizontal lift $\widetilde{\gamma}_p\colon I \to P$ starting at $p$.
+              </p>
+            </div>
+
+            <p>
+              From this point on, the <strong>parallel transport</strong> of $p$ along $\gamma$ is defined by
+            </p>
+
+            <p class="math-display">
+              $$
+                \mathrm{PT}_{\gamma}^{\omega}(p) := \widetilde{\gamma}_p(1),
+              $$
+            </p>
+
+            <p>
+              thereby formalizing the idea of comparing fibers over different points.
+            </p>
+          </div>
+
+          <div class="book-box">
+            <figure class="blog-figure-right">
+              <img src="../../images/tfgm/parallel_transport.png" alt="Parallel transport" />
+              <figcaption>Parallel transport.</figcaption>
+            </figure>
+
+            <p>
+              But what happens if the base curve is a loop? In that case, parallel transport gives rise to an automorphism of the initial fiber. Since the action of $G$ on $P$ is free and transitive on each fiber, the image of a point $p \in P_{\gamma(0)}$ under parallel transport corresponds uniquely to an element of the group $G$. This element is the <strong>holonomy</strong> of the loop $\gamma$ with respect to the point $p$ and the connection $\omega$, denoted $\mathrm{hol}_{p}^{\omega}(\gamma)$.
+            </p>
+          </div>
+
+          <div class="book-box">
+            <figure class="blog-figure-right">
+              <img src="../../images/tfgm/holonomy.png" alt="Holonomy" />
+              <figcaption>Holonomy.</figcaption>
+            </figure>
+
+            <p>
+              With loops in mind, it is natural to ask under what conditions the holonomy of a loop depends only on its homotopy class in the fundamental group of $M$. In other words: do two homotopic loops always have the same holonomy? In general, the answer is no. However, there is a special class of connections for which this property does hold: <em>flat</em> connections.
+            </p>
+
+            <p>
+              To discuss flatness, however, we must first introduce the notion of the <strong>curvature</strong> of a connection $\omega$, defined through Cartan's structure equation:
+            </p>
+
+            <p class="math-display">
+              $$
+                \Omega := \boldsymbol{\mathrm{d}}\omega + \frac{1}{2}[\omega,\omega]
+                \in \Omega^2(P,\mathfrak{g}).
+              $$
+            </p>
+
+            <p>
+              In fact, as a consequence of the Frobenius theorem, one obtains the following result.
+            </p>
+
+            <div class="theorem-box">
+              <h4>Theorem</h4>
+              <p>
+                Let $\pi\colon P \to M$ be a principal $G$-bundle with connection $\omega$. Then the horizontal distribution defined by $\omega$ is integrable if and only if $\omega$ is flat.
+              </p>
+            </div>
+
+            <p>
+              This theorem therefore characterizes the curvature of a connection as a measure of the non-integrability of the associated horizontal distribution. As expected, <strong>flat connections</strong> are precisely those whose curvature vanishes.
+            </p>
+          </div>
+        </div>
+
+        <hr />
+
+        <h3 class="book-section-title">The Riemann&ndash;Hilbert Correspondence</h3>
+        <div class="book-container">
+          <div class="book-box">
+            <figure class="blog-figure-right">
+              <img src="../../images/tfgm/flat_conn_hol.png" alt="Holonomy and homotopy" />
+              <figcaption>Holonomy and homotopy.</figcaption>
+            </figure>
+
+            <p>
+              From now on, assume that $M$ is connected. As suggested above, vanishing curvature produces an essential simplification: parallel transport no longer depends on the specific path, but only on its homotopy class in the fundamental group of $M$. This leads to the following theorem, which is central to the project.
+            </p>
+
+            <div class="theorem-box">
+              <h4>Theorem</h4>
+              <p>
+                Let $\omega$ be a flat connection on a principal $G$-bundle $\pi\colon P \to M$, let $x_0 \in M$, and let $p \in P_{x_0}$. Then the holonomy $\mathrm{hol}_{p}^{\omega}$ is well defined on $\pi_1(M,x_0)$.
+              </p>
+            </div>
+
+            <p>
+              Thus, flat connections allow us to define a <strong>representation</strong> of the fundamental group of $M$ into the structure group $G$ by the map
+            </p>
+
+            <p class="math-display">
+              $$
+                \rho_p^{\omega}\colon \pi_1(M,x_0) \longrightarrow G,
+                \qquad
+                [\gamma] \longmapsto \mathrm{hol}_{p}^{\omega}(\gamma).
+              $$
+            </p>
+
+            <p>
+              In fact, this homomorphism is independent of the point $p \in P_{x_0}$ up to conjugation, since different points in the initial fiber produce conjugate representations. Therefore, every flat connection on a principal $G$-bundle determines a conjugacy class of representations of $\pi_1(M)$ into $G$.
+            </p>
+          </div>
+
+          <div class="book-box">
+            <p>
+              From here, it is natural to ask whether the converse is also true: are two flat connections equivalent whenever they induce the same class of representations in $\mathrm{Hom}(\pi_1(M),G)/G$? Surprisingly, the answer is yes. However, the notion of equivalence must be made precise: two connections $\omega$ and $\omega'$ on bundles $\pi\colon P \to M$ and $\pi'\colon P' \to M$ are called equivalent if there exists an isomorphism $F$ of principal $G$-bundles over $M$ such that $F^*\omega' = \omega$. This gives the central theorem of the project.
+            </p>
+
+            <div class="theorem-box">
+              <h4>Theorem: Riemann&ndash;Hilbert Correspondence</h4>
+              <p>
+                Let $G$ be a Lie group and let $M$ be a connected smooth manifold. Then there is a bijection between the following sets:
+              </p>
+
+              <p class="math-display">
+                $$
+                  \frac{\big\{ \text{flat principal }G\text{-bundles over }M \big\}}{\text{isomorphism}}
+                  \quad \longleftrightarrow \quad
+                  \frac{\big\{ G\text{-representations of }\pi_1(M) \big\}}{\text{conjugation}}.
+                $$
+              </p>
+            </div>
+
+            <p>
+              In fact, in the seminal work of Atiyah and Bott, both sides of the correspondence are endowed with suitable topologies, and the correspondence is shown to be a homeomorphism between topological spaces.
+            </p>
+          </div>
+        </div>
+
+        <hr />
+
+        <h3 class="book-section-title">Flat Principal $\mathbb{S}^1$-Bundles over Surfaces</h3>
+        <div class="book-container">
+          <div class="book-box">
+            <p>
+              A particularly relevant case is $G = \mathbb{S}^1 \subset \mathbb{C}$, when $M$ is a compact, connected, oriented, differentiable surface without boundary. By the classification theorem for compact connected surfaces, every such surface is homeomorphic to a connected sum of $g$ tori, or to $\mathbb{S}^2$ when $g = 0$, where $g$ denotes the genus of $M$. In this case,
+            </p>
+
+            <p class="math-display">
+              $$
+                \Gamma := \pi_1(M)
+                =
+                \left\langle
+                  a_1,b_1,\dots,a_g,b_g
+                  \;\middle|\;
+                  a_1b_1a_1^{-1}b_1^{-1}\cdots
+                  a_gb_ga_g^{-1}b_g^{-1}=1
+                \right\rangle,
+              $$
+            </p>
+
+            <p>
+              where $\Gamma$ is trivial if $g = 0$. On the other hand, $\mathbb{S}^1$ is an abelian, compact, one-dimensional Lie group. In particular, the conjugation action is trivial, and therefore
+            </p>
+
+            <p class="math-display">
+              $$
+                \mathrm{Hom}(\Gamma,\mathbb{S}^1)/\mathbb{S}^1
+                =
+                \mathrm{Hom}(\Gamma,\mathbb{S}^1)
+                =
+                (\mathbb{S}^1)^{2g}.
+              $$
+            </p>
+
+            <p>
+              The Riemann&ndash;Hilbert correspondence therefore identifies the isomorphism classes of flat principal $\mathbb{S}^1$-bundles over $M$ with the points of $(\mathbb{S}^1)^{2g}$. In particular, when $g = 0$, that is, for $M \cong \mathbb{S}^2$, there is only one flat principal bundle: the trivial bundle.
+            </p>
+          </div>
+        </div>
+
+        <hr />
+
+        <h3 class="book-section-title">Conclusions and Impact</h3>
+        <div class="book-container">
+          <div class="book-box">
+            <p>
+              Overall, the Riemann&ndash;Hilbert correspondence establishes a bridge: it translates the classification of principal bundles with flat connection&mdash;a problem of a geometric nature&mdash;into the classification of representations of the fundamental group, which is algebraic and topological in character.
+            </p>
+
+            <p>
+              This duality is not only conceptually elegant, but also highly fruitful. It has direct applications in gauge theory and in the analysis of functionals such as the Yang&ndash;Mills action. In this context, flat connections arise as a subset of the critical points of the functional, and the correspondence provides a description of the moduli space of these solutions through the representation space of $\pi_1(M)$.
+            </p>
+
+            <p>
+              This becomes especially concrete in the case of $\mathbb{S}^1$-bundles over surfaces, where the theory leads to an explicit classification of flat bundles. Moreover, the implications of this correspondence extend beyond pure mathematics, resonating in theoretical physics through its connections with broader constructions such as the Seiberg&ndash;Witten equations, or the recovery of Maxwell's equations as a particular case of the Yang&ndash;Mills equations for the group $\mathbb{S}^1$.
+            </p>
+
+            <p>
+              Ultimately, the Riemann&ndash;Hilbert correspondence embodies Henri Poincaré's famous maxim:
+            </p>
+
+            <blockquote>
+              "Mathematics is the art of giving the same name to different things."
+            </blockquote>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- bottom footer -->
+    <footer>
+      <a class="footer-link" href="https://www.linkedin.com/in/mar%C3%A7al-herraiz-bay%C3%B3-249b501b7/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a class="footer-link" href="https://github.com/Marshhall" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <p class="copyright-text">© 2026 M.<span>&#x200A;</span>H.<span>&#x200A;</span>B.</p>
+    </footer>
+  </body>
+</html>
