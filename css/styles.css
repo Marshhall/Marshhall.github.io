@@ -1536,13 +1536,22 @@ ul {
   margin: 10px 0 0 30px;
   padding: 0;
   overflow: hidden;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out, visibility 0s 0.4s;
+}
+
+.additional-info.visible {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.4s ease-in-out, visibility 0s;
 }
 
 .ects {
   color: #333;
   margin: 0;
   padding: 0;
-  float:left; /* add this */
+  float:left;
   line-height: 1.5em;
 }
 
