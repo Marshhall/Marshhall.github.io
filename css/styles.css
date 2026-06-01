@@ -1458,6 +1458,16 @@ ul {
   font-variant-caps: small-caps;
 }
 
+.affiliation-line {
+  margin: 4px 0 0 30px;
+  padding: 0;
+  text-align: left;
+  color: #40514e;
+  font-size: 17px;
+  line-height: 1.5em;
+  font-weight: 500;
+}
+
 .location {
   color: #40514e;
 }
