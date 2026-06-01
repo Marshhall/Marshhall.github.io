@@ -1,31 +1,41 @@
 document.addEventListener("DOMContentLoaded", () => {
     // Toggle button functionality for expandable containers
     document.querySelectorAll(".toggle-button").forEach(button => {
-    button.addEventListener("click", function () {
-        const container = this.closest(".expandable-container");
-        const description = container.querySelector(".description");
-        const additionalInfo = container.querySelector(".additional-info");
+        button.addEventListener("click", function () {
+            const container = this.closest(".expandable-container");
+            const description = container.querySelector(".description");
+            const additionalInfo = container.querySelector(".additional-info");
 
-        if (description.classList.contains("expanded")) {
-            // Collapse
-            description.style.height = "0";
-            description.style.paddingTop = "0";
-            description.style.paddingBottom = "0";
-            description.classList.remove("expanded");
-            additionalInfo.classList.remove("visible");
-            this.classList.remove("expanded");
-            this.textContent = "+";
-        } else {
-            // Expand
-            description.style.height = description.scrollHeight + "px";
-            description.style.paddingBottom = "12px";
-            description.classList.add("expanded");
-            additionalInfo.classList.add("visible");
-            this.classList.add("expanded");
-            this.textContent = "-";
-        }
+            if (description.classList.contains("expanded")) {
+                // Collapse
+                description.style.height = "0";
+                description.style.paddingTop = "0";
+                description.style.paddingBottom = "0";
+
+                description.classList.remove("expanded");
+
+                if (additionalInfo) {
+                    additionalInfo.classList.remove("visible");
+                }
+
+                this.classList.remove("expanded");
+                this.textContent = "+";
+            } else {
+                // Expand
+                description.style.height = description.scrollHeight + "px";
+                description.style.paddingBottom = "12px";
+
+                description.classList.add("expanded");
+
+                if (additionalInfo) {
+                    additionalInfo.classList.add("visible");
+                }
+
+                this.classList.add("expanded");
+                this.textContent = "-";
+            }
+        });
     });
-});
 
     // Intersection Observer for animating linear progress bars
     const progressBars = document.querySelectorAll(".progress-fill");
