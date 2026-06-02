@@ -1471,14 +1471,17 @@ ul {
   font-variant-caps: small-caps;
 }
 
+
 .affiliation-line {
   margin: 4px 0 0 30px;
   padding: 0;
   text-align: left;
-  color: #40514e;
-  font-size: 17px;
+  color: #60706d;
+  font-size: 1rem;
   line-height: 1.5em;
+  font-family: "Montserrat", sans-serif;
   font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .location {
