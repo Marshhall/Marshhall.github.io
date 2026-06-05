@@ -1405,12 +1405,9 @@ ul {
 }
 
 .institution-logo {
-  /* max-width: 300px;
-  width: 100%; */
-  height: auto; /* Maintains original aspect ratio */
-  display: block; /* Prevents inline spacing issues */
+  height: auto;
+  display: block;
   object-fit: contain;
-  border-radius: 5px;
   max-width: 300px;
   max-height: 90px;
   margin-bottom: 5px;
