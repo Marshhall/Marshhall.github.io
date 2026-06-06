@@ -1385,6 +1385,15 @@ ul {
   color: #ffffff;
 }
 
+.psl-container .header {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.psl-container .psl-logo {
+  max-height: 105px;
+}
+
 .date-logo {
   width: 100%;
   max-width: 300px;
