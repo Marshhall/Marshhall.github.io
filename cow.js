@@ -387,7 +387,8 @@
     const t = smootherst(morphT);
 
     cowYaw = Math.sin(now * 0.0006) * 0.18;
-    shapeYaw += 0.007 + t * 0.007;
+    const SHAPE_ROT_SPEED = 0.0025; // lower = slower
+    shapeYaw += SHAPE_ROT_SPEED + t * SHAPE_ROT_SPEED;
 
     const yaw = lerp(cowYaw, shapeYaw, t);
     const FOV = 800, mr2 = mouse.r * mouse.r;
