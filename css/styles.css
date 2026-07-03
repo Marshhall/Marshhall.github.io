@@ -1490,6 +1490,34 @@ ul {
   letter-spacing: 0.01em;
 }
 
+.affiliation-line .ens-link,
+.affiliation-line .dauphine-link {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  font-family: "Montserrat", sans-serif;
+  color: #60706d;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.affiliation-line .ens-link:hover {
+  color: #ffde00;
+  background-color: #5f259f;
+}
+
+.affiliation-line .dauphine-link:hover {
+  color: #ffffff;
+  background-color: #2e4588;
+}
+
+.affiliation-separator {
+  color: #60706d;
+  padding: 0 5px;
+  font-weight: 600;
+}
+
 .location {
   margin-left: auto;
   color: #40514e;
