@@ -10,3 +10,5 @@ https://webdeasy.de/en/top-css-buttons-en/
 Fer que en el timeline es pugui clicar i que et porti a la secció corresponent del CV
 
 Fer que alguna lletra de les localitzacions del CV es converteixi en una cosa típica d'aquell lloc. Per exemple: i de "Paris" en torre Eiffel.
+
+Fer una personeta de pal (tipo animation vs math) que t'acompanyi per la pag web amb objectes tmb (e.g., una galàxia, baixant per una corda). L'estil tipus Measurement de Lockhart, dibuix "a mà". Potser que tingués a vegades vinyetes amb comentaris tipus "What is that about?"
