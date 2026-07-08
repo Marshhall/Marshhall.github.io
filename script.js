@@ -416,9 +416,9 @@ document.addEventListener("DOMContentLoaded", () => {
         ropeSettle: 700,
         ropeClimbBlend: 500,
         climb: 3200,
-        floorAppear: 350,
+        floorAppear: 850,
         stand: 1200,
-        greet: 700,
+        greet: 1400,
         pauseBeforeRopeRetract: 100,
         ropeRetract: 850,
         bubbleDelay: 150
@@ -467,6 +467,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function easeInOut(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
     function easeInQuad(t) { return t * t; }
     function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+    function easeOutSoft(t) {return 1 - Math.pow(1 - t, 4);}
     function lerp(a, b, t) { return a + (b - a) * t; }
     function lerpPoint(a, b, t) { return { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t) }; }
     function add(a, b) { return { x: a.x + b.x, y: a.y + b.y }; }
@@ -512,7 +513,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function getLandingMoment() {
-        return lerp(GUIDE.standStart, GUIDE.standEnd, 0.72);
+        /*
+          The board should dip when the stickman first becomes properly standing.
+          This happens partway through the stand phase, not at the start and not
+          as late as the greeting pose.
+        */
+        return lerp(GUIDE.standStart, GUIDE.standEnd, 0.32);
     }
 
     function getBodyMeasurements(scale = STICKMAN_SCALE) {
@@ -858,17 +864,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function getPlatformMotion(time) {
         const baseY = ny(GUIDE.floorY);
-        const floorEnd = GUIDE.floorEnd;
-        const hover = time >= floorEnd ? Math.sin(time / 420) * 1.6 : 0;
+
         const landingMoment = getLandingMoment();
-        const landingT = progress(time, landingMoment, landingMoment + 450);
-        const landingDip = Math.sin(Math.PI * landingT) * 5;
+
+        /*
+        The board should stay visually stable before the stickman's feet touch it.
+        So hover starts only after the landing dip has mostly finished.
+        */
+        const landingDipDuration = 360;
+        const hoverStart = landingMoment + landingDipDuration;
+
+        const landingT = progress(
+            time,
+            landingMoment,
+            landingMoment + landingDipDuration
+        );
+
+        const landingDip =
+            Math.sin(Math.PI * landingT) * 3.5;
+
+        const hoverFadeT = easeOutCubic(
+            progress(time, hoverStart, hoverStart + 500)
+        );
+
+        const hover =
+            Math.sin(time / 420) * 1.6 * hoverFadeT;
 
         return {
             baseY,
             hover,
             landingDip,
-            y: baseY + hover + landingDip
+            y: baseY + landingDip + hover
         };
     }
 
@@ -1064,19 +1090,38 @@ document.addEventListener("DOMContentLoaded", () => {
         if (t >= GUIDE.standStart) {
             stickman.style.opacity = "1";
 
-            const standT = easeInOut(progress(t, GUIDE.standStart, GUIDE.standEnd));
             const landingPose = interpolatePose(climbingPoseA, climbingPoseB, 0.5);
-            currentPose = interpolatePose(landingPose, welcomingPose, standT);
+            const feetTouchT = 0.55;
+
+            if (t < GUIDE.standEnd) {
+                const rawStandT = progress(t, GUIDE.standStart, GUIDE.standEnd);
+
+                if (rawStandT < feetTouchT) {
+                    const settleT = easeInOut(rawStandT / feetTouchT);
+                    currentPose = interpolatePose(landingPose, standingPose, settleT);
+                } else {
+                    currentPose = standingPose;
+                }
+            } else {
+                const welcomeT = easeInOut(
+                    progress(t, GUIDE.greetStart, GUIDE.greetEnd)
+                );
+
+                currentPose = interpolatePose(standingPose, welcomingPose, welcomeT);
+            }
 
             const landingMoment = getLandingMoment();
-            const rideBoardT = easeInOut(progress(t, landingMoment, landingMoment + 350));
             const platformMotion = getPlatformMotion(t);
-            yOffset = (platformMotion.hover + platformMotion.landingDip) * rideBoardT;
 
-            if (standT < 0.5) {
-                squash = lerp(1, 0.94, standT / 0.5);
+            const rideBoardT = t >= landingMoment ? 1 : 0;
+
+            yOffset = (platformMotion.hover + platformMotion.landingDip) * rideBoardT;
+            const impactT = progress(t, landingMoment, landingMoment + 360);
+
+            if (impactT < 0.5) {
+                squash = lerp(1, 0.94, impactT / 0.5);
             } else {
-                squash = lerp(0.94, 1, (standT - 0.5) / 0.5);
+                squash = lerp(0.94, 1, (impactT - 0.5) / 0.5);
             }
         }
 
