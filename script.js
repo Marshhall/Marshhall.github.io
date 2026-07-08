@@ -157,6 +157,534 @@ document.addEventListener("DOMContentLoaded", () => {
         timelineObserver.observe(timeline);
     }
 
+
+    function initAboutAtomScene() {
+        const svg = document.getElementById("about-atom-scene-svg");
+        if (!svg) return;
+
+        const atomGroup = document.getElementById("about-atom-group");
+        const orbitGroup = document.getElementById("about-atom-orbits");
+
+        const electron1 = document.getElementById("about-electron-1");
+        const electron2 = document.getElementById("about-electron-2");
+        const electron3 = document.getElementById("about-electron-3");
+
+        const orbit1 = document.getElementById("about-orbit-1");
+        const orbit2 = document.getElementById("about-orbit-2");
+        const orbit3 = document.getElementById("about-orbit-3");
+
+        const nucleusMain = document.getElementById("about-nucleus-main");
+        const nucleusWarmDot = document.querySelector(".about-nucleus-dot--warm");
+        const nucleusCoolDot = document.querySelector(".about-nucleus-dot--cool");
+
+        const stressLines = Array.from(
+            document.querySelectorAll("#about-nucleus-stress line")
+        );
+
+        const crackGlow = document.getElementById("about-nucleus-crack-glow");
+        const crackPath = document.getElementById("about-nucleus-crack");
+
+        const head = document.getElementById("about-stick-head");
+
+        const neckLine = document.getElementById("about-stick-neck");
+        const torsoLine = document.getElementById("about-stick-torso");
+
+        const leftUpperArm = document.getElementById("about-stick-left-upper-arm");
+        const leftLowerArm = document.getElementById("about-stick-left-lower-arm");
+        const rightUpperArm = document.getElementById("about-stick-right-upper-arm");
+        const rightLowerArm = document.getElementById("about-stick-right-lower-arm");
+
+        const leftUpperLeg = document.getElementById("about-stick-left-upper-leg");
+        const leftLowerLeg = document.getElementById("about-stick-left-lower-leg");
+        const rightUpperLeg = document.getElementById("about-stick-right-upper-leg");
+        const rightLowerLeg = document.getElementById("about-stick-right-lower-leg");
+
+        const leftHand = document.getElementById("about-stick-left-hand");
+        const rightHand = document.getElementById("about-stick-right-hand");
+        const leftFoot = document.getElementById("about-stick-left-foot");
+        const rightFoot = document.getElementById("about-stick-right-foot");
+
+        /*
+        Same proportions as the homepage stickman.
+        The scene composition changes, but these body ratios are preserved.
+        */
+        const ABOUT_SVG = {
+            width: 260,
+            height: 210
+        };
+
+        const STICKMAN_SCALE = 0.82;
+
+        const BODY = {
+            headRadius: 0.062,
+            neckLength: 0.01,
+            torsoLength: 0.17,
+            shoulderWidth: 0,
+            upperArm: 0.105,
+            lowerArm: 0.105,
+            upperLeg: 0.125,
+            lowerLeg: 0.125
+        };
+
+        /*
+        Style adjustment:
+        - smaller nucleus: nucleusR 13.5 instead of 17
+        - larger orbits: orbitRx/orbitRy increased
+        */
+        const ATOM = {
+            cx: 178,
+            cy: 94,
+            orbitRx: 62,
+            orbitRy: 26,
+            nucleusR: 13.5
+        };
+
+        function relativeLength(value, scale = STICKMAN_SCALE) {
+            return value * ABOUT_SVG.height * scale;
+        }
+
+        function getBodyMeasurements(scale = STICKMAN_SCALE) {
+            return {
+                headRadius: relativeLength(BODY.headRadius, scale),
+                neckLength: relativeLength(BODY.neckLength, scale),
+                torsoLength: relativeLength(BODY.torsoLength, scale),
+                shoulderWidth: relativeLength(BODY.shoulderWidth, scale),
+                upperArm: relativeLength(BODY.upperArm, scale),
+                lowerArm: relativeLength(BODY.lowerArm, scale),
+                upperLeg: relativeLength(BODY.upperLeg, scale),
+                lowerLeg: relativeLength(BODY.lowerLeg, scale)
+            };
+        }
+
+        function clamp(value, min, max) {
+            return Math.max(min, Math.min(max, value));
+        }
+
+        function add(a, b) {
+            return {
+                x: a.x + b.x,
+                y: a.y + b.y
+            };
+        }
+
+        function degreesToRadians(degrees) {
+            return (degrees * Math.PI) / 180;
+        }
+
+        function vectorFromAngle(angleRadians, length) {
+            return {
+                x: Math.cos(angleRadians) * length,
+                y: Math.sin(angleRadians) * length
+            };
+        }
+
+        function setLine(element, a, b) {
+            if (!element) return;
+
+            element.setAttribute("x1", a.x);
+            element.setAttribute("y1", a.y);
+            element.setAttribute("x2", b.x);
+            element.setAttribute("y2", b.y);
+        }
+
+        function setCircle(element, point) {
+            if (!element) return;
+
+            element.setAttribute("cx", point.x);
+            element.setAttribute("cy", point.y);
+        }
+
+        function ellipsePoint(cx, cy, rx, ry, angle, rotationDegrees) {
+            const xLocal = rx * Math.cos(angle);
+            const yLocal = ry * Math.sin(angle);
+
+            const rotation = degreesToRadians(rotationDegrees);
+            const cos = Math.cos(rotation);
+            const sin = Math.sin(rotation);
+
+            return {
+                x: cx + xLocal * cos - yLocal * sin,
+                y: cy + xLocal * sin + yLocal * cos
+            };
+        }
+
+        function createTorso({ hip, scale = STICKMAN_SCALE, lean = 0 }) {
+            const m = getBodyMeasurements(scale);
+            const leanRadians = degreesToRadians(lean);
+
+            const chest = add(
+                hip,
+                vectorFromAngle(
+                    -Math.PI / 2 + leanRadians,
+                    m.torsoLength
+                )
+            );
+
+            const neck = add(
+                chest,
+                vectorFromAngle(
+                    -Math.PI / 2 + leanRadians,
+                    m.neckLength
+                )
+            );
+
+            const headCenter = add(
+                neck,
+                vectorFromAngle(
+                    -Math.PI / 2 + leanRadians,
+                    m.headRadius
+                )
+            );
+
+            const shoulderAngle = leanRadians;
+            const shoulderVector = vectorFromAngle(
+                shoulderAngle,
+                m.shoulderWidth / 2
+            );
+
+            return {
+                head: headCenter,
+                neck,
+                chest,
+                hip,
+                leftShoulder: {
+                    x: chest.x - shoulderVector.x,
+                    y: chest.y - shoulderVector.y
+                },
+                rightShoulder: {
+                    x: chest.x + shoulderVector.x,
+                    y: chest.y + shoulderVector.y
+                }
+            };
+        }
+
+        function createBentLimb(start, end, upperLength, lowerLength, bend = 1) {
+            const dx = end.x - start.x;
+            const dy = end.y - start.y;
+
+            const distance = Math.hypot(dx, dy) || 0.0001;
+            const maxReach = upperLength + lowerLength - 0.001;
+            const safeDistance = Math.min(distance, maxReach);
+
+            const ux = dx / distance;
+            const uy = dy / distance;
+
+            const a =
+                (
+                    upperLength * upperLength -
+                    lowerLength * lowerLength +
+                    safeDistance * safeDistance
+                ) /
+                (2 * safeDistance);
+
+            const hSquared = Math.max(upperLength * upperLength - a * a, 0);
+            const h = Math.sqrt(hSquared);
+
+            const mid = {
+                x: start.x + ux * a,
+                y: start.y + uy * a
+            };
+
+            const px = -uy;
+            const py = ux;
+
+            return {
+                x: mid.x + px * h * bend,
+                y: mid.y + py * h * bend
+            };
+        }
+
+        function updateStaticAtomGeometry() {
+            /*
+            Keep the HTML flexible: even if the SVG file still has older orbit
+            and nucleus sizes, JS updates them to the corrected proportions.
+            */
+            [orbit1, orbit2, orbit3].forEach((orbit) => {
+                if (!orbit) return;
+
+                orbit.setAttribute("cx", ATOM.cx);
+                orbit.setAttribute("cy", ATOM.cy);
+                orbit.setAttribute("rx", ATOM.orbitRx);
+                orbit.setAttribute("ry", ATOM.orbitRy);
+            });
+
+            if (orbit2) {
+                orbit2.setAttribute(
+                    "transform",
+                    `rotate(60 ${ATOM.cx} ${ATOM.cy})`
+                );
+            }
+
+            if (orbit3) {
+                orbit3.setAttribute(
+                    "transform",
+                    `rotate(-60 ${ATOM.cx} ${ATOM.cy})`
+                );
+            }
+
+            if (nucleusMain) {
+                nucleusMain.setAttribute("cx", ATOM.cx);
+                nucleusMain.setAttribute("cy", ATOM.cy);
+                nucleusMain.setAttribute("r", ATOM.nucleusR);
+            }
+
+            if (nucleusWarmDot) {
+                nucleusWarmDot.setAttribute("cx", ATOM.cx - 9.5);
+                nucleusWarmDot.setAttribute("cy", ATOM.cy + 5.5);
+                nucleusWarmDot.setAttribute("r", 5.6);
+            }
+
+            if (nucleusCoolDot) {
+                nucleusCoolDot.setAttribute("cx", ATOM.cx + 9.0);
+                nucleusCoolDot.setAttribute("cy", ATOM.cy - 6.0);
+                nucleusCoolDot.setAttribute("r", 5.6);
+            }
+
+            if (crackGlow) {
+                crackGlow.setAttribute("cx", ATOM.cx);
+                crackGlow.setAttribute("cy", ATOM.cy);
+            }
+        }
+
+        function getCrackPath(cx, cy, r, strength) {
+            /*
+            Shorter continuous crack.
+            The inset keeps it inside the nucleus boundary.
+            */
+            const s = 1 + 0.15 * strength;
+            const inset = 1;
+
+            return `
+                M ${cx - 1.0 * s} ${cy - (r - inset)}
+                L ${cx + 3.0 * s} ${cy - 5.8}
+                L ${cx - 0.8 * s} ${cy - 0.7}
+                L ${cx + 3.4 * s} ${cy + 4.5}
+                L ${cx + 0.5 * s} ${cy + (r - inset)}
+            `;
+        }
+
+        updateStaticAtomGeometry();
+
+        function drawScene(time) {
+            const m = getBodyMeasurements();
+
+            const effort = (Math.sin(time / 430) + 1) / 2;
+            const pull = Math.pow(effort, 1.7);
+            const bodyBob = Math.sin(time / 260) * 0.85;
+            const armTug = Math.sin(time / 150) * 0.9;
+
+            const atomOffset = {
+                x: 1.4 * pull,
+                y: Math.sin(time / 180) * 0.65
+            };
+
+            if (atomGroup) {
+                atomGroup.setAttribute(
+                    "transform",
+                    `translate(${atomOffset.x} ${atomOffset.y})`
+                );
+            }
+
+            /*
+            Electrons are calculated directly on the larger orbits.
+            */
+            setCircle(
+                electron1,
+                ellipsePoint(
+                    ATOM.cx,
+                    ATOM.cy,
+                    ATOM.orbitRx,
+                    ATOM.orbitRy,
+                    time / 650,
+                    0
+                )
+            );
+
+            setCircle(
+                electron2,
+                ellipsePoint(
+                    ATOM.cx,
+                    ATOM.cy,
+                    ATOM.orbitRx,
+                    ATOM.orbitRy,
+                    time / 780 + 1.8,
+                    60
+                )
+            );
+
+            setCircle(
+                electron3,
+                ellipsePoint(
+                    ATOM.cx,
+                    ATOM.cy,
+                    ATOM.orbitRx,
+                    ATOM.orbitRy,
+                    time / 720 + 3.4,
+                    -60
+                )
+            );
+
+            /*
+            Because the nucleus is smaller, the stickman needs to grip a little
+            closer to the center while still grabbing the left boundary.
+            */
+            const hip = {
+                x: 119 - 2.1 * pull,
+                y: 150 + bodyBob
+            };
+
+            const torso = createTorso({
+                hip,
+                scale: STICKMAN_SCALE,
+                lean: 24 + 3 * pull
+            });
+
+            const atomLeftEdge = {
+                x: ATOM.cx - ATOM.nucleusR + atomOffset.x,
+                y: ATOM.cy + atomOffset.y
+            };
+
+            const leftHandPoint = {
+                x: atomLeftEdge.x + 1.0,
+                y: atomLeftEdge.y - 6.0 + armTug
+            };
+
+            const rightHandPoint = {
+                x: atomLeftEdge.x + 1.4,
+                y: atomLeftEdge.y + 6.0 - armTug
+            };
+
+            const leftElbow = createBentLimb(
+                torso.leftShoulder,
+                leftHandPoint,
+                m.upperArm,
+                m.lowerArm,
+                1
+            );
+
+            const rightElbow = createBentLimb(
+                torso.rightShoulder,
+                rightHandPoint,
+                m.upperArm,
+                m.lowerArm,
+                -1
+            );
+
+            const leftFootPoint = {
+                x: hip.x - 28,
+                y: hip.y + 37
+            };
+
+            const rightFootPoint = {
+                x: hip.x + 31,
+                y: hip.y + 34
+            };
+
+            const leftKnee = createBentLimb(
+                torso.hip,
+                leftFootPoint,
+                m.upperLeg,
+                m.lowerLeg,
+                -1
+            );
+
+            const rightKnee = createBentLimb(
+                torso.hip,
+                rightFootPoint,
+                m.upperLeg,
+                m.lowerLeg,
+                1
+            );
+
+            if (head) {
+                head.setAttribute("r", m.headRadius);
+                setCircle(head, torso.head);
+            }
+
+            setLine(neckLine, torso.neck, torso.chest);
+            setLine(torsoLine, torso.chest, torso.hip);
+
+            setLine(leftUpperArm, torso.leftShoulder, leftElbow);
+            setLine(leftLowerArm, leftElbow, leftHandPoint);
+
+            setLine(rightUpperArm, torso.rightShoulder, rightElbow);
+            setLine(rightLowerArm, rightElbow, rightHandPoint);
+
+            setLine(leftUpperLeg, torso.hip, leftKnee);
+            setLine(leftLowerLeg, leftKnee, leftFootPoint);
+
+            setLine(rightUpperLeg, torso.hip, rightKnee);
+            setLine(rightLowerLeg, rightKnee, rightFootPoint);
+
+            setCircle(leftHand, leftHandPoint);
+            setCircle(rightHand, rightHandPoint);
+            setCircle(leftFoot, leftFootPoint);
+            setCircle(rightFoot, rightFootPoint);
+
+            const crackStrength = Math.pow(pull, 2.2);
+            const flicker = 0.88 + 0.12 * Math.sin(time / 55);
+
+            if (crackPath) {
+                crackPath.setAttribute(
+                    "d",
+                    getCrackPath(
+                        ATOM.cx,
+                        ATOM.cy,
+                        ATOM.nucleusR,
+                        crackStrength
+                    )
+                );
+
+                crackPath.style.opacity =
+                    String(0.92 * crackStrength * flicker);
+            }
+
+            if (crackGlow) {
+                /*
+                The glow should be a thin halo around the smaller nucleus,
+                not a filled disk. Otherwise it creates a pale/white-looking
+                interior around the nucleus.
+                */
+                crackGlow.setAttribute("cx", ATOM.cx);
+                crackGlow.setAttribute("cy", ATOM.cy);
+
+                crackGlow.setAttribute(
+                    "r",
+                    String(ATOM.nucleusR + 0.8 + 3 * crackStrength)
+                );
+
+                crackGlow.setAttribute("fill", "none");
+                crackGlow.setAttribute("stroke", "#ff7f7f");
+
+                crackGlow.setAttribute(
+                    "stroke-width",
+                    String(4.0 + 1.2 * crackStrength)
+                );
+
+                crackGlow.style.opacity =
+                    String(0.24 * crackStrength * flicker);
+            }
+
+            const stressBase = 0.16 + 0.45 * pull;
+
+            stressLines.forEach((line, index) => {
+                const extra = 0.10 * Math.sin(time / 90 + index * 0.9);
+                line.style.opacity =
+                    String(clamp(stressBase + extra, 0.08, 0.62));
+            });
+        }
+
+        function animate(now) {
+            drawScene(now);
+            requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    initAboutAtomScene();
+
+
     /* ========================= */
     /* Stickman guide animation  */
     /* ========================= */
