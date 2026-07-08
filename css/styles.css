@@ -829,39 +829,41 @@ ul {
   opacity: 0.8;
 }
 
-.about-nucleus-main {
-  fill: url("#about-nucleus-gradient");
+/* Nucleus: two clusters + neck */
+.about-nucleus-lobe--warm {
+  fill: url("#about-nucleus-gradient-warm");
 }
 
-.about-nucleus-dot--warm {
-  fill: #f08b8b;
+.about-nucleus-lobe--cool {
+  fill: url("#about-nucleus-gradient-cool");
 }
 
-.about-nucleus-dot--cool {
-  fill: #7fc8c8;
+.about-nucleus-neck {
+  fill: #8fc9c9;
+  transition: opacity 0.2s ease;
 }
 
-.about-nucleus-crack-glow {
-  fill: none;
-  stroke: #ff7f7f;
-  opacity: 0;
+.about-nucleus-glow {
+  fill: #ff7f5f;
   filter: url("#about-crack-glow-filter");
-}
-
-.about-nucleus-crack {
-  fill: none;
-  stroke: #40514e;
-  stroke-width: 1.3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
   opacity: 0;
 }
 
 .about-nucleus-stress line {
-  stroke: #f08b8b;
-  stroke-width: 2.4;
+  stroke: #ff7f7f;
+  stroke-width: 2;
   stroke-linecap: round;
-  opacity: 0.28;
+  opacity: 0;
+}
+
+.about-fission-particle {
+  fill: #ffb199;
+}
+
+/* Ground */
+.about-ground-line {
+  fill: #66bfbf;
+  opacity: 0.35;
 }
 
 /* Stickman */

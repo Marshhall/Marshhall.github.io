@@ -163,7 +163,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!svg) return;
 
         const atomGroup = document.getElementById("about-atom-group");
-        const orbitGroup = document.getElementById("about-atom-orbits");
 
         const electron1 = document.getElementById("about-electron-1");
         const electron2 = document.getElementById("about-electron-2");
@@ -173,19 +172,26 @@ document.addEventListener("DOMContentLoaded", () => {
         const orbit2 = document.getElementById("about-orbit-2");
         const orbit3 = document.getElementById("about-orbit-3");
 
-        const nucleusMain = document.getElementById("about-nucleus-main");
-        const nucleusWarmDot = document.querySelector(".about-nucleus-dot--warm");
-        const nucleusCoolDot = document.querySelector(".about-nucleus-dot--cool");
+        const nucleusLobeWarm = document.getElementById("about-nucleus-lobe-warm");
+        const nucleusLobeCool = document.getElementById("about-nucleus-lobe-cool");
+        const nucleusNeck = document.getElementById("about-nucleus-neck");
+        const nucleusGlow = document.getElementById("about-nucleus-glow");
 
         const stressLines = Array.from(
             document.querySelectorAll("#about-nucleus-stress line")
         );
 
-        const crackGlow = document.getElementById("about-nucleus-crack-glow");
-        const crackPath = document.getElementById("about-nucleus-crack");
+        const particles = [
+            document.getElementById("about-fission-particle-1"),
+            document.getElementById("about-fission-particle-2"),
+            document.getElementById("about-fission-particle-3"),
+            document.getElementById("about-fission-particle-4")
+        ];
+        const PARTICLE_ANGLES = [-140, -40, 140, 40];
+
+        const groundLine = document.getElementById("about-ground-line");
 
         const head = document.getElementById("about-stick-head");
-
         const neckLine = document.getElementById("about-stick-neck");
         const torsoLine = document.getElementById("about-stick-torso");
 
@@ -204,40 +210,43 @@ document.addEventListener("DOMContentLoaded", () => {
         const leftFoot = document.getElementById("about-stick-left-foot");
         const rightFoot = document.getElementById("about-stick-right-foot");
 
-        /*
-        Same proportions as the homepage stickman.
-        The scene composition changes, but these body ratios are preserved.
-        */
-        const ABOUT_SVG = {
-            width: 260,
-            height: 210
-        };
-
+        const ABOUT_SVG = { width: 260, height: 210 };
         const STICKMAN_SCALE = 0.82;
 
+        /*
+        Arms are slightly longer than the homepage stickman's so he can
+        plausibly reach across the gap as the two nucleon clusters separate.
+        */
         const BODY = {
             headRadius: 0.062,
             neckLength: 0.01,
             torsoLength: 0.17,
             shoulderWidth: 0,
-            upperArm: 0.105,
-            lowerArm: 0.105,
+            upperArm: 0.12,
+            lowerArm: 0.12,
             upperLeg: 0.125,
             lowerLeg: 0.125
         };
 
-        /*
-        Style adjustment:
-        - smaller nucleus: nucleusR 13.5 instead of 17
-        - larger orbits: orbitRx/orbitRy increased
-        */
         const ATOM = {
             cx: 178,
             cy: 94,
             orbitRx: 62,
-            orbitRy: 26,
-            nucleusR: 13.5
+            orbitRy: 26
         };
+
+        /*
+        The nucleus is modeled as two nucleon clusters joined by a neck that
+        thins as the pull increases, in the style of the liquid-drop model of
+        fission, rather than a single sphere with a decorative crack.
+        */
+        const NUCLEUS = {
+            lobeRadius: 8.2,
+            restHalfSep: 5,
+            maxExtraHalfSep: 10,
+            neckShrinkFactor: 0.85
+        };
+        NUCLEUS.neckBaseHalfWidth = NUCLEUS.lobeRadius * 0.9;
 
         function relativeLength(value, scale = STICKMAN_SCALE) {
             return value * ABOUT_SVG.height * scale;
@@ -261,10 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         function add(a, b) {
-            return {
-                x: a.x + b.x,
-                y: a.y + b.y
-            };
+            return { x: a.x + b.x, y: a.y + b.y };
         }
 
         function degreesToRadians(degrees) {
@@ -280,7 +286,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         function setLine(element, a, b) {
             if (!element) return;
-
             element.setAttribute("x1", a.x);
             element.setAttribute("y1", a.y);
             element.setAttribute("x2", b.x);
@@ -289,7 +294,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         function setCircle(element, point) {
             if (!element) return;
-
             element.setAttribute("cx", point.x);
             element.setAttribute("cy", point.y);
         }
@@ -312,49 +316,19 @@ document.addEventListener("DOMContentLoaded", () => {
             const m = getBodyMeasurements(scale);
             const leanRadians = degreesToRadians(lean);
 
-            const chest = add(
-                hip,
-                vectorFromAngle(
-                    -Math.PI / 2 + leanRadians,
-                    m.torsoLength
-                )
-            );
+            const chest = add(hip, vectorFromAngle(-Math.PI / 2 + leanRadians, m.torsoLength));
+            const neck = add(chest, vectorFromAngle(-Math.PI / 2 + leanRadians, m.neckLength));
+            const headCenter = add(neck, vectorFromAngle(-Math.PI / 2 + leanRadians, m.headRadius));
 
-            const neck = add(
-                chest,
-                vectorFromAngle(
-                    -Math.PI / 2 + leanRadians,
-                    m.neckLength
-                )
-            );
-
-            const headCenter = add(
-                neck,
-                vectorFromAngle(
-                    -Math.PI / 2 + leanRadians,
-                    m.headRadius
-                )
-            );
-
-            const shoulderAngle = leanRadians;
-            const shoulderVector = vectorFromAngle(
-                shoulderAngle,
-                m.shoulderWidth / 2
-            );
+            const shoulderVector = vectorFromAngle(leanRadians, m.shoulderWidth / 2);
 
             return {
                 head: headCenter,
                 neck,
                 chest,
                 hip,
-                leftShoulder: {
-                    x: chest.x - shoulderVector.x,
-                    y: chest.y - shoulderVector.y
-                },
-                rightShoulder: {
-                    x: chest.x + shoulderVector.x,
-                    y: chest.y + shoulderVector.y
-                }
+                leftShoulder: { x: chest.x - shoulderVector.x, y: chest.y - shoulderVector.y },
+                rightShoulder: { x: chest.x + shoulderVector.x, y: chest.y + shoulderVector.y }
             };
         }
 
@@ -370,21 +344,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const uy = dy / distance;
 
             const a =
-                (
-                    upperLength * upperLength -
-                    lowerLength * lowerLength +
-                    safeDistance * safeDistance
-                ) /
+                (upperLength * upperLength - lowerLength * lowerLength + safeDistance * safeDistance) /
                 (2 * safeDistance);
 
             const hSquared = Math.max(upperLength * upperLength - a * a, 0);
             const h = Math.sqrt(hSquared);
 
-            const mid = {
-                x: start.x + ux * a,
-                y: start.y + uy * a
-            };
-
+            const mid = { x: start.x + ux * a, y: start.y + uy * a };
             const px = -uy;
             const py = ux;
 
@@ -394,73 +360,45 @@ document.addEventListener("DOMContentLoaded", () => {
             };
         }
 
+        function getNeckPath(ax, ay, bx, by, halfWidth) {
+            if (halfWidth <= 0.35) return "";
+
+            const midX = (ax + bx) / 2;
+            const midY = (ay + by) / 2;
+            const pinch = halfWidth * 0.5;
+
+            return `
+                M ${ax} ${ay - halfWidth}
+                Q ${midX} ${midY - pinch}, ${bx} ${by - halfWidth}
+                L ${bx} ${by + halfWidth}
+                Q ${midX} ${midY + pinch}, ${ax} ${ay + halfWidth}
+                Z
+            `;
+        }
+
         function updateStaticAtomGeometry() {
-            /*
-            Keep the HTML flexible: even if the SVG file still has older orbit
-            and nucleus sizes, JS updates them to the corrected proportions.
-            */
             [orbit1, orbit2, orbit3].forEach((orbit) => {
                 if (!orbit) return;
-
                 orbit.setAttribute("cx", ATOM.cx);
                 orbit.setAttribute("cy", ATOM.cy);
                 orbit.setAttribute("rx", ATOM.orbitRx);
                 orbit.setAttribute("ry", ATOM.orbitRy);
             });
 
-            if (orbit2) {
-                orbit2.setAttribute(
-                    "transform",
-                    `rotate(60 ${ATOM.cx} ${ATOM.cy})`
-                );
+            if (orbit2) orbit2.setAttribute("transform", `rotate(60 ${ATOM.cx} ${ATOM.cy})`);
+            if (orbit3) orbit3.setAttribute("transform", `rotate(-60 ${ATOM.cx} ${ATOM.cy})`);
+
+            if (nucleusLobeWarm) {
+                nucleusLobeWarm.setAttribute("cx", ATOM.cx - NUCLEUS.restHalfSep);
+                nucleusLobeWarm.setAttribute("cy", ATOM.cy);
+                nucleusLobeWarm.setAttribute("r", NUCLEUS.lobeRadius);
             }
 
-            if (orbit3) {
-                orbit3.setAttribute(
-                    "transform",
-                    `rotate(-60 ${ATOM.cx} ${ATOM.cy})`
-                );
+            if (nucleusLobeCool) {
+                nucleusLobeCool.setAttribute("cx", ATOM.cx + NUCLEUS.restHalfSep);
+                nucleusLobeCool.setAttribute("cy", ATOM.cy);
+                nucleusLobeCool.setAttribute("r", NUCLEUS.lobeRadius);
             }
-
-            if (nucleusMain) {
-                nucleusMain.setAttribute("cx", ATOM.cx);
-                nucleusMain.setAttribute("cy", ATOM.cy);
-                nucleusMain.setAttribute("r", ATOM.nucleusR);
-            }
-
-            if (nucleusWarmDot) {
-                nucleusWarmDot.setAttribute("cx", ATOM.cx - 9.5);
-                nucleusWarmDot.setAttribute("cy", ATOM.cy + 5.5);
-                nucleusWarmDot.setAttribute("r", 5.6);
-            }
-
-            if (nucleusCoolDot) {
-                nucleusCoolDot.setAttribute("cx", ATOM.cx + 9.0);
-                nucleusCoolDot.setAttribute("cy", ATOM.cy - 6.0);
-                nucleusCoolDot.setAttribute("r", 5.6);
-            }
-
-            if (crackGlow) {
-                crackGlow.setAttribute("cx", ATOM.cx);
-                crackGlow.setAttribute("cy", ATOM.cy);
-            }
-        }
-
-        function getCrackPath(cx, cy, r, strength) {
-            /*
-            Shorter continuous crack.
-            The inset keeps it inside the nucleus boundary.
-            */
-            const s = 1 + 0.15 * strength;
-            const inset = 1;
-
-            return `
-                M ${cx - 1.0 * s} ${cy - (r - inset)}
-                L ${cx + 3.0 * s} ${cy - 5.8}
-                L ${cx - 0.8 * s} ${cy - 0.7}
-                L ${cx + 3.4 * s} ${cy + 4.5}
-                L ${cx + 0.5 * s} ${cy + (r - inset)}
-            `;
         }
 
         updateStaticAtomGeometry();
@@ -470,131 +408,133 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const effort = (Math.sin(time / 430) + 1) / 2;
             const pull = Math.pow(effort, 1.7);
-            const bodyBob = Math.sin(time / 260) * 0.85;
-            const armTug = Math.sin(time / 150) * 0.9;
+            const bodyBob = Math.sin(time / 260) * 0.8;
+            const armTug = Math.sin(time / 150) * 0.8;
 
             const atomOffset = {
-                x: 1.4 * pull,
-                y: Math.sin(time / 180) * 0.65
+                x: Math.sin(time / 210) * 0.6,
+                y: Math.sin(time / 260) * 0.5
             };
 
             if (atomGroup) {
-                atomGroup.setAttribute(
-                    "transform",
-                    `translate(${atomOffset.x} ${atomOffset.y})`
-                );
+                atomGroup.setAttribute("transform", `translate(${atomOffset.x} ${atomOffset.y})`);
             }
 
+            setCircle(electron1, ellipsePoint(ATOM.cx, ATOM.cy, ATOM.orbitRx, ATOM.orbitRy, time / 650, 0));
+            setCircle(electron2, ellipsePoint(ATOM.cx, ATOM.cy, ATOM.orbitRx, ATOM.orbitRy, time / 780 + 1.8, 60));
+            setCircle(electron3, ellipsePoint(ATOM.cx, ATOM.cy, ATOM.orbitRx, ATOM.orbitRy, time / 720 + 3.4, -60));
+
             /*
-            Electrons are calculated directly on the larger orbits.
+            The nucleus splits along a horizontal axis: a warm cluster pulled
+            left, a cool cluster pulled right, joined by a neck that shrinks
+            as the pull strengthens.
             */
-            setCircle(
-                electron1,
-                ellipsePoint(
-                    ATOM.cx,
-                    ATOM.cy,
-                    ATOM.orbitRx,
-                    ATOM.orbitRy,
-                    time / 650,
-                    0
-                )
+            const extraSep = NUCLEUS.maxExtraHalfSep * pull;
+            const halfSep = NUCLEUS.restHalfSep + extraSep;
+
+            const lobeA = {
+                x: ATOM.cx - halfSep,
+                y: ATOM.cy + Math.sin(time / 300) * 0.9
+            };
+            const lobeB = {
+                x: ATOM.cx + halfSep,
+                y: ATOM.cy - Math.sin(time / 340 + 1.2) * 0.9
+            };
+
+            if (nucleusLobeWarm) {
+                nucleusLobeWarm.setAttribute("cx", lobeA.x);
+                nucleusLobeWarm.setAttribute("cy", lobeA.y);
+            }
+            if (nucleusLobeCool) {
+                nucleusLobeCool.setAttribute("cx", lobeB.x);
+                nucleusLobeCool.setAttribute("cy", lobeB.y);
+            }
+
+            const neckHalfWidth = clamp(
+                NUCLEUS.neckBaseHalfWidth - extraSep * NUCLEUS.neckShrinkFactor,
+                0,
+                NUCLEUS.neckBaseHalfWidth
             );
 
-            setCircle(
-                electron2,
-                ellipsePoint(
-                    ATOM.cx,
-                    ATOM.cy,
-                    ATOM.orbitRx,
-                    ATOM.orbitRy,
-                    time / 780 + 1.8,
-                    60
-                )
-            );
+            if (nucleusNeck) {
+                nucleusNeck.setAttribute("d", getNeckPath(lobeA.x, lobeA.y, lobeB.x, lobeB.y, neckHalfWidth));
+                nucleusNeck.style.opacity = neckHalfWidth > 0.35 ? "1" : "0";
+            }
 
-            setCircle(
-                electron3,
-                ellipsePoint(
-                    ATOM.cx,
-                    ATOM.cy,
-                    ATOM.orbitRx,
-                    ATOM.orbitRy,
-                    time / 720 + 3.4,
-                    -60
-                )
-            );
+            const tension = clamp(1 - neckHalfWidth / NUCLEUS.neckBaseHalfWidth, 0, 1);
+            const midX = (lobeA.x + lobeB.x) / 2;
+            const midY = (lobeA.y + lobeB.y) / 2;
+            const flicker = 0.85 + 0.15 * Math.sin(time / 55);
+
+            if (nucleusGlow) {
+                nucleusGlow.setAttribute("cx", midX);
+                nucleusGlow.setAttribute("cy", midY);
+                nucleusGlow.setAttribute("r", String(NUCLEUS.lobeRadius * 0.4 + tension * 9));
+                nucleusGlow.style.opacity = String((0.1 + 0.55 * tension) * flicker);
+            }
+
+            stressLines.forEach((line, index) => {
+                const angle = degreesToRadians(index * 60 + time / 40);
+                const inner = NUCLEUS.lobeRadius * 0.55;
+                const outer = inner + tension * 10;
+
+                setLine(
+                    line,
+                    { x: midX + Math.cos(angle) * inner, y: midY + Math.sin(angle) * inner },
+                    { x: midX + Math.cos(angle) * outer, y: midY + Math.sin(angle) * outer }
+                );
+
+                line.style.opacity = String(clamp(tension * 0.7, 0, 0.7));
+            });
+
+            const releaseProgress = clamp((tension - 0.82) / 0.18, 0, 1);
+
+            PARTICLE_ANGLES.forEach((angle, index) => {
+                const particle = particles[index];
+                if (!particle) return;
+
+                const dist = releaseProgress * 17;
+                setCircle(particle, {
+                    x: midX + Math.cos(degreesToRadians(angle)) * dist,
+                    y: midY + Math.sin(degreesToRadians(angle)) * dist
+                });
+
+                particle.setAttribute("r", String(1.2 + releaseProgress * 0.6));
+                particle.style.opacity = String(
+                    releaseProgress > 0.02 ? (1 - releaseProgress) * 0.85 : 0
+                );
+            });
 
             /*
-            Because the nucleus is smaller, the stickman needs to grip a little
-            closer to the center while still grabbing the left boundary.
+            Stickman braces below the atom and leans AWAY from it as tension
+            builds, like someone pulling on a rope, rather than leaning into it.
             */
             const hip = {
-                x: 119 - 2.1 * pull,
+                x: 163 - 3 * pull,
                 y: 150 + bodyBob
             };
 
-            const torso = createTorso({
-                hip,
-                scale: STICKMAN_SCALE,
-                lean: 24 + 3 * pull
-            });
-
-            const atomLeftEdge = {
-                x: ATOM.cx - ATOM.nucleusR + atomOffset.x,
-                y: ATOM.cy + atomOffset.y
-            };
+            const lean = -10 - 7 * pull;
+            const torso = createTorso({ hip, scale: STICKMAN_SCALE, lean });
 
             const leftHandPoint = {
-                x: atomLeftEdge.x + 1.0,
-                y: atomLeftEdge.y - 6.0 + armTug
+                x: lobeA.x + NUCLEUS.lobeRadius * 0.35,
+                y: lobeA.y - 1.5 + armTug * 0.4
             };
 
             const rightHandPoint = {
-                x: atomLeftEdge.x + 1.4,
-                y: atomLeftEdge.y + 6.0 - armTug
+                x: lobeB.x - NUCLEUS.lobeRadius * 0.35,
+                y: lobeB.y + 1.5 - armTug * 0.4
             };
 
-            const leftElbow = createBentLimb(
-                torso.leftShoulder,
-                leftHandPoint,
-                m.upperArm,
-                m.lowerArm,
-                1
-            );
+            const leftElbow = createBentLimb(torso.leftShoulder, leftHandPoint, m.upperArm, m.lowerArm, 1);
+            const rightElbow = createBentLimb(torso.rightShoulder, rightHandPoint, m.upperArm, m.lowerArm, -1);
 
-            const rightElbow = createBentLimb(
-                torso.rightShoulder,
-                rightHandPoint,
-                m.upperArm,
-                m.lowerArm,
-                -1
-            );
+            const leftFootPoint = { x: hip.x - 26, y: hip.y + 38 };
+            const rightFootPoint = { x: hip.x + 24, y: hip.y + 36 };
 
-            const leftFootPoint = {
-                x: hip.x - 28,
-                y: hip.y + 37
-            };
-
-            const rightFootPoint = {
-                x: hip.x + 31,
-                y: hip.y + 34
-            };
-
-            const leftKnee = createBentLimb(
-                torso.hip,
-                leftFootPoint,
-                m.upperLeg,
-                m.lowerLeg,
-                -1
-            );
-
-            const rightKnee = createBentLimb(
-                torso.hip,
-                rightFootPoint,
-                m.upperLeg,
-                m.lowerLeg,
-                1
-            );
+            const leftKnee = createBentLimb(torso.hip, leftFootPoint, m.upperLeg, m.lowerLeg, -1);
+            const rightKnee = createBentLimb(torso.hip, rightFootPoint, m.upperLeg, m.lowerLeg, 1);
 
             if (head) {
                 head.setAttribute("r", m.headRadius);
@@ -621,57 +561,9 @@ document.addEventListener("DOMContentLoaded", () => {
             setCircle(leftFoot, leftFootPoint);
             setCircle(rightFoot, rightFootPoint);
 
-            const crackStrength = Math.pow(pull, 2.2);
-            const flicker = 0.88 + 0.12 * Math.sin(time / 55);
-
-            if (crackPath) {
-                crackPath.setAttribute(
-                    "d",
-                    getCrackPath(
-                        ATOM.cx,
-                        ATOM.cy,
-                        ATOM.nucleusR,
-                        crackStrength
-                    )
-                );
-
-                crackPath.style.opacity =
-                    String(0.92 * crackStrength * flicker);
+            if (groundLine) {
+                groundLine.style.opacity = String(0.35 + 0.1 * Math.sin(time / 500));
             }
-
-            if (crackGlow) {
-                /*
-                The glow should be a thin halo around the smaller nucleus,
-                not a filled disk. Otherwise it creates a pale/white-looking
-                interior around the nucleus.
-                */
-                crackGlow.setAttribute("cx", ATOM.cx);
-                crackGlow.setAttribute("cy", ATOM.cy);
-
-                crackGlow.setAttribute(
-                    "r",
-                    String(ATOM.nucleusR + 0.8 + 3 * crackStrength)
-                );
-
-                crackGlow.setAttribute("fill", "none");
-                crackGlow.setAttribute("stroke", "#ff7f7f");
-
-                crackGlow.setAttribute(
-                    "stroke-width",
-                    String(4.0 + 1.2 * crackStrength)
-                );
-
-                crackGlow.style.opacity =
-                    String(0.24 * crackStrength * flicker);
-            }
-
-            const stressBase = 0.16 + 0.45 * pull;
-
-            stressLines.forEach((line, index) => {
-                const extra = 0.10 * Math.sin(time / 90 + index * 0.9);
-                line.style.opacity =
-                    String(clamp(stressBase + extra, 0.08, 0.62));
-            });
         }
 
         function animate(now) {
