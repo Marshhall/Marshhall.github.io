@@ -829,39 +829,68 @@ ul {
   opacity: 0.8;
 }
 
-.about-nucleus-main {
-  fill: url("#about-nucleus-gradient");
+/* Nucleus: two clusters + neck */
+.about-nucleus-lobe--warm {
+  fill: url("#about-nucleus-gradient-warm");
 }
 
-.about-nucleus-dot--warm {
-  fill: #f08b8b;
+.about-nucleus-lobe--cool {
+  fill: url("#about-nucleus-gradient-cool");
 }
 
-.about-nucleus-dot--cool {
-  fill: #7fc8c8;
+.about-nucleus-neck {
+  fill: #8fc9c9;
+  transition: opacity 0.2s ease;
 }
 
-.about-nucleus-crack-glow {
-  fill: none;
-  stroke: #ff7f7f;
-  opacity: 0;
+.about-nucleus-glow {
+  fill: #9b8cff; /* soft violet / sci-fi lavender */
+  /* fill: #b8adff; soft periwinkle violet */
+  /* fill: #8f7dff; stronger electric violet */
+  /* fill: #c7bfff; pale lavender */
+  /* fill: #d8d3ff; very pale lilac */
+  /* fill: #7f8cff; blue-violet / sci-fi blue */
+  /* fill: #30e3cb; electric cyan */
+  /* fill: #66bfbf; soft aqua / site teal */
+  /* fill: #11999e; deep teal */
+  /* fill: #ff7f5f; original reddish-orange glow */
+
   filter: url("#about-crack-glow-filter");
-}
-
-.about-nucleus-crack {
-  fill: none;
-  stroke: #40514e;
-  stroke-width: 1.3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
   opacity: 0;
 }
 
 .about-nucleus-stress line {
-  stroke: #f08b8b;
-  stroke-width: 2.4;
+  stroke: #8f7dff; /* electric violet */
+  /* stroke: #c7bfff; soft lavender energy */
+  /* stroke: #b8adff; medium lavender */
+  /* stroke: #d8d3ff; pale lilac */
+  /* stroke: #7f8cff; blue-violet */
+  /* stroke: #30e3cb; electric cyan */
+  /* stroke: #66bfbf; soft aqua / site teal */
+  /* stroke: #11999e; deep teal */
+  /* stroke: #ff7f7f; original reddish stress lines */
+
+  stroke-width: 2;
   stroke-linecap: round;
-  opacity: 0.28;
+  opacity: 0;
+}
+
+.about-fission-particle {
+  fill: #d8d3ff; /* pale lilac */
+  /* fill: #c7bfff; soft lavender */
+  /* fill: #b8adff; medium lavender */
+  /* fill: #9b8cff; soft violet */
+  /* fill: #8f7dff; electric violet */
+  /* fill: #7f8cff; blue-violet */
+  /* fill: #b8f7f2; pale mint energy */
+  /* fill: #30e3cb; electric cyan */
+  /* fill: #ffb199; original peach particle */
+}
+
+/* Ground */
+.about-ground-line {
+  fill: #66bfbf;
+  opacity: 0.35;
 }
 
 /* Stickman */
