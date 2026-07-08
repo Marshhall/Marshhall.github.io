@@ -1131,7 +1131,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let guideDismissRequested = false;
 
     function getGuideScrollTrigger() {
-        return Math.max(100, window.innerHeight * 0.15);
+        return Math.max(60, window.innerHeight * 0.08);
     }
 
     function flyGuideToNavbar() {
@@ -1315,6 +1315,46 @@ document.addEventListener("DOMContentLoaded", () => {
         flyGuideToNavbar();
     }
 
+    function applyRightArmWave(pose, time) {
+        /*
+        Wave only after the stickman has reached the welcoming phase.
+        This prevents the arm from waving while climbing or landing.
+        */
+        const waveStart = GUIDE.greetStart + 250;
+        const waveEnd = GUIDE.greetEnd + 2500;
+
+        const waveVisibility = Math.sin(
+            Math.PI * progress(time, waveStart, waveEnd)
+        );
+
+        if (waveVisibility <= 0) {
+            return pose;
+        }
+
+        const wave = Math.sin(time / 160) * waveVisibility;
+
+        /*
+        Copy the pose so we do not mutate the original pose object.
+        */
+        const wavedPose = {
+            ...pose,
+            rightElbow: { ...pose.rightElbow },
+            rightHand: { ...pose.rightHand }
+        };
+
+        /*
+        Keep the shoulder fixed, then wiggle only the lower part of the arm.
+        Small values are best; otherwise it looks chaotic.
+        */
+        wavedPose.rightElbow.x += wave * 2.0;
+        wavedPose.rightElbow.y += wave * 1.0;
+
+        wavedPose.rightHand.x += wave * 5.5;
+        wavedPose.rightHand.y += Math.abs(wave) * 2.2;
+
+        return wavedPose;
+    }
+
     window.addEventListener("scroll", handleGuideScrollAway, {
         passive: true
     });
@@ -1402,6 +1442,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 squash = lerp(0.94, 1, (impactT - 0.5) / 0.5);
             }
         }
+
+        currentPose = applyRightArmWave(currentPose, t);
 
         drawStickman(currentPose, yOffset, squash);
         drawHoverPlatform(t);
