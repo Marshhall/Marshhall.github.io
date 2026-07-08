@@ -168,6 +168,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const electron2 = document.getElementById("about-electron-2");
         const electron3 = document.getElementById("about-electron-3");
 
+        const ELECTRON_RADIUS = 3;
+
+        [electron1, electron2, electron3].forEach((electron) => {
+            if (electron) {
+                electron.setAttribute("r", ELECTRON_RADIUS);
+            }
+        });
+
         const orbit1 = document.getElementById("about-orbit-1");
         const orbit2 = document.getElementById("about-orbit-2");
         const orbit3 = document.getElementById("about-orbit-3");
@@ -421,8 +429,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             setCircle(electron1, ellipsePoint(ATOM.cx, ATOM.cy, ATOM.orbitRx, ATOM.orbitRy, time / 650, 0));
-            setCircle(electron2, ellipsePoint(ATOM.cx, ATOM.cy, ATOM.orbitRx, ATOM.orbitRy, time / 780 + 1.8, 60));
-            setCircle(electron3, ellipsePoint(ATOM.cx, ATOM.cy, ATOM.orbitRx, ATOM.orbitRy, time / 720 + 3.4, -60));
+            setCircle(electron2, ellipsePoint(ATOM.cx, ATOM.cy, ATOM.orbitRx, ATOM.orbitRy, time / 780 + 2 * Math.PI / 3, 60));
+            setCircle(electron3, ellipsePoint(ATOM.cx, ATOM.cy, ATOM.orbitRx, ATOM.orbitRy, time / 720 + 5 * Math.PI / 3, -60));
 
             /*
             The nucleus splits along a horizontal axis: a warm cluster pulled
