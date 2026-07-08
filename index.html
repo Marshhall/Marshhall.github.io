@@ -84,15 +84,38 @@
         <circle id="guide-right-foot" class="guide-joint" r="2.7" />
       </g>
 
-      <!-- Floor -->
-      <line
-        id="guide-floor-line"
-        class="guide-floor-line"
-        x1="52"
-        y1="229"
-        x2="128"
-        y2="229"
-      />
+      <!-- Hover platform -->
+      <g id="guide-floor" class="guide-floor">
+        <line
+          id="guide-floor-line"
+          class="guide-floor-line"
+          x1="90"
+          y1="229"
+          x2="90"
+          y2="229"
+        />
+
+        <line
+          id="guide-floor-glow"
+          class="guide-floor-glow"
+          x1="90"
+          y1="229"
+          x2="90"
+          y2="229"
+        />
+
+        <g id="guide-floor-particles" class="guide-floor-particles">
+          <circle id="guide-floor-particle-1" class="guide-floor-particle" r="1.7" />
+          <circle id="guide-floor-particle-2" class="guide-floor-particle" r="1.7" />
+          <circle id="guide-floor-particle-3" class="guide-floor-particle" r="1.7" />
+          <circle id="guide-floor-particle-4" class="guide-floor-particle" r="1.7" />
+
+          <circle id="guide-floor-particle-5" class="guide-floor-particle guide-burst-particle" r="1.7" />
+          <circle id="guide-floor-particle-6" class="guide-floor-particle guide-burst-particle" r="1.7" />
+          <circle id="guide-floor-particle-7" class="guide-floor-particle guide-burst-particle" r="1.7" />
+          <circle id="guide-floor-particle-8" class="guide-floor-particle guide-burst-particle" r="1.7" />
+        </g>
+      </g>
     </svg>
 
     <!-- Optional bubble. Leave commented for now. -->

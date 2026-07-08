@@ -449,12 +449,51 @@ ul {
 /* Floor                     */
 /* ========================= */
 
+/* ========================= */
+/* Hover platform floor      */
+/* ========================= */
+
+.guide-floor {
+  opacity: 0;
+}
+
 .guide-floor-line {
   stroke: #66bfbf;
   stroke-width: 7;
   stroke-linecap: round;
+  filter: drop-shadow(0 5px 8px rgba(17, 153, 158, 0.25));
+}
+
+.guide-floor-glow {
+  stroke: #66bfbf;
+  stroke-width: 15;
+  stroke-linecap: round;
+  opacity: 0.2;
+  filter: blur(2px);
+}
+
+.guide-floor-particle {
   opacity: 0;
-  filter: drop-shadow(0 8px 12px rgba(17, 153, 158, 0.25));
+}
+
+#guide-floor-particle-1,
+#guide-floor-particle-5 {
+  fill: #ffd166;
+}
+
+#guide-floor-particle-2,
+#guide-floor-particle-6 {
+  fill: #ff9f1c;
+}
+
+#guide-floor-particle-3,
+#guide-floor-particle-7 {
+  fill: #fef9c3;
+}
+
+#guide-floor-particle-4,
+#guide-floor-particle-8 {
+  fill: #66bfbf;
 }
 
 /* ========================= */
@@ -557,12 +596,16 @@ ul {
     opacity: 1;
   }
 
-  .guide-floor-line {
+  .guide-floor {
     opacity: 1;
   }
 
   .guide-rope-line,
   .guide-rope-ring {
+    opacity: 0;
+  }
+
+  .guide-floor-particle {
     opacity: 0;
   }
 }

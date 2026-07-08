@@ -161,12 +161,26 @@ document.addEventListener("DOMContentLoaded", () => {
     /* Stickman guide animation  */
     /* ========================= */
 
+    let introFinished = false;
     const siteGuide = document.getElementById("site-guide");
 
     const ropeLine = document.getElementById("guide-rope-line");
     const ropeRing = document.getElementById("guide-rope-ring");
     const stickman = document.getElementById("guide-stickman");
+    const floor = document.getElementById("guide-floor");
     const floorLine = document.getElementById("guide-floor-line");
+    const floorGlow = document.getElementById("guide-floor-glow");
+
+    const floorParticles = [
+        document.getElementById("guide-floor-particle-1"),
+        document.getElementById("guide-floor-particle-2"),
+        document.getElementById("guide-floor-particle-3"),
+        document.getElementById("guide-floor-particle-4"),
+        document.getElementById("guide-floor-particle-5"),
+        document.getElementById("guide-floor-particle-6"),
+        document.getElementById("guide-floor-particle-7"),
+        document.getElementById("guide-floor-particle-8")
+    ];
 
     const head = document.getElementById("guide-head");
 
@@ -271,7 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ropeClimbBlend: 500,
         climb: 3200,
         floorAppear: 350,
-        stand: 900,
+        stand: 1200,
         greet: 700,
         pauseBeforeRopeRetract: 100,
         ropeRetract: 850,
@@ -461,6 +475,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function ropeClimbingSway(time) {
         return Math.sin(time / 260) * 0.010;
+    }
+
+    function getLandingMoment() {
+        return lerp(
+            GUIDE.standStart,
+            GUIDE.standEnd,
+            0.72
+        );
     }
 
     /* ========================= */
@@ -789,7 +811,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return pose;
     }
 
-    function createRelaxedGreetingPose({
+    function createWelcomingPose({
         hip,
         scale = STICKMAN_SCALE,
         lean = -2
@@ -1046,7 +1068,7 @@ document.addEventListener("DOMContentLoaded", () => {
         wavingSide: "left"
     });
 
-    const relaxedGreetingPose = createRelaxedGreetingPose({
+    const welcomingPose = createWelcomingPose({
     hip: point(0.5, 0.66),
     scale: STICKMAN_SCALE,
     lean: -2,
@@ -1096,6 +1118,107 @@ document.addEventListener("DOMContentLoaded", () => {
         setCircle(rightFoot, pose.rightFoot);
 
         head.setAttribute("r", getBodyMeasurements(STICKMAN_SCALE).headRadius);
+    }
+
+       function drawPlatformParticles({
+        time,
+        centerX,
+        y,
+        platformVisible
+    }) {
+        const landingMoment = getLandingMoment();
+
+        const preLandingT = easeInOut(
+            progress(
+                time,
+                landingMoment - 700,
+                landingMoment
+            )
+        );
+
+        const thrustFadeT = easeInOut(
+            progress(
+                time,
+                landingMoment + 6000,
+                landingMoment + 12000
+            )
+        );
+
+        const sustainedThrust =
+            preLandingT * (1 - thrustFadeT);
+
+        const engineStrength =
+            Math.min(1, platformVisible * 3);
+
+        /*
+        Permanent final visibility level.
+        Increase this if the idle propulsion is still too subtle.
+        */
+        const idleBase = 0.52;
+
+        const idleIntensity =
+            engineStrength *
+            lerp(0.16, idleBase, preLandingT);
+
+        const extraParticleIntensity =
+            engineStrength *
+            sustainedThrust *
+            0.95;
+
+        const offsets = [-34, -12, 12, 34, -26, -6, 8, 26];
+
+        floorParticles.forEach((particle, index) => {
+            const isExtraParticle = index >= 4;
+
+            const speed = isExtraParticle ? 420 : 650;
+
+            const phase =
+                (time / speed + index * 0.19) % 1;
+
+            const offset = offsets[index % offsets.length];
+
+            const particleX =
+                centerX +
+                offset +
+                Math.sin(time / 190 + index) * 2;
+
+            const travelDistance =
+                isExtraParticle ? 28 : 22;
+
+            const particleY =
+                y +
+                12 +
+                phase * travelDistance;
+
+            const fade =
+                Math.sin(Math.PI * phase);
+
+            let opacity;
+
+            if (isExtraParticle) {
+                /*
+                Extra particles are only for landing thrust.
+                They fade away after the calm-down.
+                */
+                opacity =
+                    fade *
+                    extraParticleIntensity;
+            } else {
+                /*
+                Base particles continue forever.
+                This is the permanent hoverboard propulsion.
+                */
+                opacity =
+                    fade *
+                    idleIntensity;
+            }
+
+            particle.setAttribute("cx", particleX);
+            particle.setAttribute("cy", particleY);
+            particle.setAttribute("r", "1.7");
+
+            particle.style.opacity = opacity;
+        });
     }
 
     function drawRope(length, time) {
@@ -1244,6 +1367,104 @@ document.addEventListener("DOMContentLoaded", () => {
         ropeRing.setAttribute("cy", endY);
     }
 
+    function getPlatformMotion(time) {
+        const baseY = ny(GUIDE.floorY);
+
+        const floorEnd = GUIDE.floorEnd;
+
+        /*
+        Gentle hover after the platform appears.
+        This value will be shared by both:
+        - the board
+        - the stickman after landing
+        */
+        const hover =
+            time >= floorEnd
+                ? Math.sin(time / 420) * 1.6
+                : 0;
+
+        /*
+        Landing dip.
+        The platform dips when the stickman lands.
+        */
+        const landingMoment = getLandingMoment();
+
+        const landingT = progress(
+            time,
+            landingMoment,
+            landingMoment + 450
+        );
+
+        const landingDip =
+            Math.sin(Math.PI * landingT) * 5;
+
+        return {
+            baseY,
+            hover,
+            landingDip,
+            y: baseY + hover + landingDip
+        };
+    }
+
+    function drawHoverPlatform(time) {
+        const floorStart = GUIDE.floorStart;
+        const floorEnd = GUIDE.floorEnd;
+
+        const platformCenterX = nx(0.5);
+
+        const fullHalfWidth = nx(0.21);
+
+        /*
+        The floor starts appearing before the stickman lands.
+        */
+        const appearT = easeOutCubic(
+            progress(time, floorStart, floorEnd)
+        );
+
+        /*
+        Platform hover after it appears.
+        Keep this subtle.
+        */
+
+        const platformMotion = getPlatformMotion(time);
+        const y = platformMotion.y;
+
+        /*
+        Expand from the center outward.
+        */
+        const halfWidth = fullHalfWidth * appearT;
+
+        floor.style.opacity = appearT;
+
+        floorLine.setAttribute("x1", platformCenterX - halfWidth);
+        floorLine.setAttribute("x2", platformCenterX + halfWidth);
+        floorLine.setAttribute("y1", y);
+        floorLine.setAttribute("y2", y);
+
+        floorGlow.setAttribute("x1", platformCenterX - halfWidth);
+        floorGlow.setAttribute("x2", platformCenterX + halfWidth);
+        floorGlow.setAttribute("y1", y);
+        floorGlow.setAttribute("y2", y);
+
+        /*
+        Glow pulses once as the floor appears,
+        then settles into a soft glow.
+        */
+        const glowPulse =
+            Math.sin(Math.PI * appearT) * 0.45;
+
+        floorGlow.style.opacity = 0.16 + glowPulse;
+
+        drawPlatformParticles({
+            time,
+            centerX: platformCenterX,
+            y,
+            platformVisible: appearT
+        });
+    }
+
+ 
+
     function drawFloor(scale) {
         const floorY = ny(GUIDE.floorY);
 
@@ -1268,6 +1489,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function animateGuide(timestamp) {
         const t = timestamp - animationStartTime;
+        if (siteGuide.classList.contains("hidden")) {
+            return;
+        }
 
         /*
             1. Rope falls from the navbar.
@@ -1370,8 +1594,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const landingPose = interpolatePose(climbingPoseA, climbingPoseB, 0.5);
 
-            currentPose = interpolatePose(landingPose, relaxedGreetingPose, standT);
-            yOffset = 0;
+            currentPose = interpolatePose(landingPose, welcomingPose, standT);
+            const platformMotion = getPlatformMotion(t);
+            yOffset = platformMotion.hover + platformMotion.landingDip;
 
             if (standT < 0.5) {
                 squash = lerp(1, 0.94, standT / 0.5);
@@ -1386,11 +1611,7 @@ document.addEventListener("DOMContentLoaded", () => {
             4. Floor appears just before landing.
         */
 
-        const floorT = easeOutBack(
-            progress(t, GUIDE.floorStart, GUIDE.floorEnd)
-        );
-
-        drawFloor(clamp(floorT, 0, 1));
+        drawHoverPlatform(t);
 
         /*
             5. Optional speech bubble.
@@ -1400,9 +1621,15 @@ document.addEventListener("DOMContentLoaded", () => {
             guideBubble.classList.add("visible");
         }
 
-        if (t < GUIDE.ropeRetractEnd + 400) {
-            requestAnimationFrame(animateGuide);
+        if (guideBubble && t > GUIDE.bubbleStart) {
+            guideBubble.classList.add("visible");
         }
+
+        /*
+            Keep the animation loop alive so the hover platform
+            and particles continue after the intro has finished.
+        */
+        requestAnimationFrame(animateGuide);
     }
 
     function startGuideAnimation(timestamp) {
