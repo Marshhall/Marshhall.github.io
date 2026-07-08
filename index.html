@@ -86,15 +86,7 @@
 
       <!-- Hover platform -->
       <g id="guide-floor" class="guide-floor">
-        <line
-          id="guide-floor-line"
-          class="guide-floor-line"
-          x1="90"
-          y1="229"
-          x2="90"
-          y2="229"
-        />
-
+        <!-- Soft glow behind the board -->
         <line
           id="guide-floor-glow"
           class="guide-floor-glow"
@@ -104,6 +96,38 @@
           y2="229"
         />
 
+        <!-- Main board body -->
+        <line
+          id="guide-floor-line"
+          class="guide-floor-line"
+          x1="90"
+          y1="229"
+          x2="90"
+          y2="229"
+        />
+
+        <!-- Two propulsors/nozzles -->
+        <g id="guide-board-propulsors" class="guide-board-propulsors">
+          <ellipse
+            id="guide-left-propulsor"
+            class="guide-board-propulsor"
+            cx="74"
+            cy="234"
+            rx="7"
+            ry="3.2"
+          />
+
+          <ellipse
+            id="guide-right-propulsor"
+            class="guide-board-propulsor"
+            cx="106"
+            cy="234"
+            rx="7"
+            ry="3.2"
+          />
+        </g>
+
+        <!-- Propulsion particles -->
         <g id="guide-floor-particles" class="guide-floor-particles">
           <circle id="guide-floor-particle-1" class="guide-floor-particle" r="1.7" />
           <circle id="guide-floor-particle-2" class="guide-floor-particle" r="1.7" />

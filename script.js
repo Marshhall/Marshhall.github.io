@@ -170,6 +170,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const floor = document.getElementById("guide-floor");
     const floorLine = document.getElementById("guide-floor-line");
     const floorGlow = document.getElementById("guide-floor-glow");
+    const leftPropulsor = document.getElementById("guide-left-propulsor");
+    const rightPropulsor = document.getElementById("guide-right-propulsor");
 
     const floorParticles = [
         document.getElementById("guide-floor-particle-1"),
@@ -1122,12 +1124,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
        function drawPlatformParticles({
         time,
-        centerX,
-        y,
+        leftEmitter,
+        rightEmitter,
         platformVisible
     }) {
         const landingMoment = getLandingMoment();
 
+        /*
+        Ease in before the stickman lands.
+        */
         const preLandingT = easeInOut(
             progress(
                 time,
@@ -1136,6 +1141,10 @@ document.addEventListener("DOMContentLoaded", () => {
             )
         );
 
+        /*
+        Long calm-down after landing.
+        Your current timing was 6000 -> 12000, so this respects that idea.
+        */
         const thrustFadeT = easeInOut(
             progress(
                 time,
@@ -1152,7 +1161,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         /*
         Permanent final visibility level.
-        Increase this if the idle propulsion is still too subtle.
+        This keeps the idle propulsion visible after the calm-down.
         */
         const idleBase = 0.52;
 
@@ -1160,35 +1169,55 @@ document.addEventListener("DOMContentLoaded", () => {
             engineStrength *
             lerp(0.16, idleBase, preLandingT);
 
+        /*
+        Extra particles for landing thrust.
+        This fades away after the long calm-down.
+        */
         const extraParticleIntensity =
             engineStrength *
             sustainedThrust *
             0.95;
 
-        const offsets = [-34, -12, 12, 34, -26, -6, 8, 26];
-
         floorParticles.forEach((particle, index) => {
             const isExtraParticle = index >= 4;
+
+            /*
+            Alternate particles between the two propulsors:
+            even index -> left propulsor
+            odd index  -> right propulsor
+            */
+            const emitter =
+                index % 2 === 0
+                    ? leftEmitter
+                    : rightEmitter;
+
+            /*
+            A tiny horizontal spread so particles do not fall in a perfect line.
+            */
+            const side =
+                index % 2 === 0
+                    ? -1
+                    : 1;
 
             const speed = isExtraParticle ? 420 : 650;
 
             const phase =
                 (time / speed + index * 0.19) % 1;
 
-            const offset = offsets[index % offsets.length];
+            const wiggle =
+                Math.sin(time / 180 + index * 1.7) * 2.2;
+
+            const drift =
+                side * phase * 2.5;
 
             const particleX =
-                centerX +
-                offset +
-                Math.sin(time / 190 + index) * 2;
+                emitter.x + wiggle + drift;
 
             const travelDistance =
-                isExtraParticle ? 28 : 22;
+                isExtraParticle ? 30 : 22;
 
             const particleY =
-                y +
-                12 +
-                phase * travelDistance;
+                emitter.y + 4 + phase * travelDistance;
 
             const fade =
                 Math.sin(Math.PI * phase);
@@ -1197,8 +1226,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (isExtraParticle) {
                 /*
-                Extra particles are only for landing thrust.
-                They fade away after the calm-down.
+                Extra particles appear during the stronger landing thrust.
                 */
                 opacity =
                     fade *
@@ -1206,13 +1234,16 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 /*
                 Base particles continue forever.
-                This is the permanent hoverboard propulsion.
                 */
                 opacity =
                     fade *
                     idleIntensity;
             }
 
+            /*
+            Fixed size. Intensity comes from more particles and opacity,
+            not from making them bigger.
+            */
             particle.setAttribute("cx", particleX);
             particle.setAttribute("cy", particleY);
             particle.setAttribute("r", "1.7");
@@ -1411,20 +1442,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const floorEnd = GUIDE.floorEnd;
 
         const platformCenterX = nx(0.5);
-
         const fullHalfWidth = nx(0.21);
 
-        /*
-        The floor starts appearing before the stickman lands.
-        */
         const appearT = easeOutCubic(
             progress(time, floorStart, floorEnd)
         );
-
-        /*
-        Platform hover after it appears.
-        Keep this subtle.
-        */
 
         const platformMotion = getPlatformMotion(time);
         const y = platformMotion.y;
@@ -1434,15 +1456,45 @@ document.addEventListener("DOMContentLoaded", () => {
         */
         const halfWidth = fullHalfWidth * appearT;
 
+        const boardLeftX = platformCenterX - halfWidth;
+        const boardRightX = platformCenterX + halfWidth;
+
+        const landingMoment = getLandingMoment();
+
+        const preLandingT = easeInOut(
+            progress(
+                time,
+                landingMoment - 700,
+                landingMoment
+            )
+        );
+
+        const thrustFadeT = easeInOut(
+            progress(
+                time,
+                landingMoment + 6000,
+                landingMoment + 12000
+            )
+        );
+
+        const sustainedThrust =
+            preLandingT * (1 - thrustFadeT);
+
+        const propulsorPulse =
+            1 + sustainedThrust * 0.01 * Math.sin(time / 90);
+
+        leftPropulsor.setAttribute("rx", 6.5 * propulsorPulse);
+        rightPropulsor.setAttribute("rx", 6.5 * propulsorPulse);
+
         floor.style.opacity = appearT;
 
-        floorLine.setAttribute("x1", platformCenterX - halfWidth);
-        floorLine.setAttribute("x2", platformCenterX + halfWidth);
+        floorLine.setAttribute("x1", boardLeftX);
+        floorLine.setAttribute("x2", boardRightX);
         floorLine.setAttribute("y1", y);
         floorLine.setAttribute("y2", y);
 
-        floorGlow.setAttribute("x1", platformCenterX - halfWidth);
-        floorGlow.setAttribute("x2", platformCenterX + halfWidth);
+        floorGlow.setAttribute("x1", boardLeftX);
+        floorGlow.setAttribute("x2", boardRightX);
         floorGlow.setAttribute("y1", y);
         floorGlow.setAttribute("y2", y);
 
@@ -1455,10 +1507,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
         floorGlow.style.opacity = 0.16 + glowPulse;
 
+        /*
+        Propulsors sit below the board.
+        They appear slightly after the board begins expanding.
+        */
+        const propulsorAppearT = easeOutCubic(
+            progress(time, floorStart + 120, floorEnd + 150)
+        );
+
+        const propulsorOffsetX = fullHalfWidth * 0.48;
+        const propulsorY = y + 6;
+
+        const leftPropulsorX = platformCenterX - propulsorOffsetX;
+        const rightPropulsorX = platformCenterX + propulsorOffsetX;
+
+        leftPropulsor.setAttribute("cx", leftPropulsorX);
+        leftPropulsor.setAttribute("cy", propulsorY);
+        leftPropulsor.setAttribute("ry", 3);
+
+        rightPropulsor.setAttribute("cx", rightPropulsorX);
+        rightPropulsor.setAttribute("cy", propulsorY);
+        rightPropulsor.setAttribute("ry", 3);
+
+        leftPropulsor.style.opacity = propulsorAppearT;
+        rightPropulsor.style.opacity = propulsorAppearT;
+
+        /*
+        Particles now come out of the two propulsors,
+        not from the center of the board.
+        */
         drawPlatformParticles({
             time,
-            centerX: platformCenterX,
-            y,
+            leftEmitter: {
+                x: leftPropulsorX,
+                y: propulsorY
+            },
+            rightEmitter: {
+                x: rightPropulsorX,
+                y: propulsorY
+            },
             platformVisible: appearT
         });
     }
