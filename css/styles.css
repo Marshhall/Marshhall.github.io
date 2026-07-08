@@ -844,20 +844,47 @@ ul {
 }
 
 .about-nucleus-glow {
-  fill: #ff7f5f;
+  fill: #9b8cff; /* soft violet / sci-fi lavender */
+  /* fill: #b8adff; soft periwinkle violet */
+  /* fill: #8f7dff; stronger electric violet */
+  /* fill: #c7bfff; pale lavender */
+  /* fill: #d8d3ff; very pale lilac */
+  /* fill: #7f8cff; blue-violet / sci-fi blue */
+  /* fill: #30e3cb; electric cyan */
+  /* fill: #66bfbf; soft aqua / site teal */
+  /* fill: #11999e; deep teal */
+  /* fill: #ff7f5f; original reddish-orange glow */
+
   filter: url("#about-crack-glow-filter");
   opacity: 0;
 }
 
 .about-nucleus-stress line {
-  stroke: #ff7f7f;
+  stroke: #8f7dff; /* electric violet */
+  /* stroke: #c7bfff; soft lavender energy */
+  /* stroke: #b8adff; medium lavender */
+  /* stroke: #d8d3ff; pale lilac */
+  /* stroke: #7f8cff; blue-violet */
+  /* stroke: #30e3cb; electric cyan */
+  /* stroke: #66bfbf; soft aqua / site teal */
+  /* stroke: #11999e; deep teal */
+  /* stroke: #ff7f7f; original reddish stress lines */
+
   stroke-width: 2;
   stroke-linecap: round;
   opacity: 0;
 }
 
 .about-fission-particle {
-  fill: #ffb199;
+  fill: #d8d3ff; /* pale lilac */
+  /* fill: #c7bfff; soft lavender */
+  /* fill: #b8adff; medium lavender */
+  /* fill: #9b8cff; soft violet */
+  /* fill: #8f7dff; electric violet */
+  /* fill: #7f8cff; blue-violet */
+  /* fill: #b8f7f2; pale mint energy */
+  /* fill: #30e3cb; electric cyan */
+  /* fill: #ffb199; original peach particle */
 }
 
 /* Ground */
