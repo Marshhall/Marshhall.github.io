@@ -379,6 +379,192 @@ ul {
 }
 
 
+/* ========================= */
+/* Stickman guide scene      */
+/* ========================= */
+
+.site-guide {
+  position: fixed;
+  top: 60px;
+  right: 9vw;
+
+  width: 145px;
+  height: 210px;
+
+  z-index: 900;
+  pointer-events: none;
+}
+
+.guide-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+/* ========================= */
+/* Rope                      */
+/* ========================= */
+
+.guide-rope-line {
+  stroke: #40514e;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.guide-rope-ring {
+  fill: #ffffff;
+  stroke: #40514e;
+  stroke-width: 2.5;
+  opacity: 0;
+}
+
+/* ========================= */
+/* Stickman                  */
+/* ========================= */
+
+.guide-stickman {
+  opacity: 0;
+}
+
+.guide-head {
+  fill: #ffffff;
+  stroke: #40514e;
+  stroke-width: 5;
+}
+
+.guide-line {
+  stroke: #40514e;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.guide-joint {
+  fill: #40514e;
+}
+
+/* ========================= */
+/* Floor                     */
+/* ========================= */
+
+.guide-floor-line {
+  stroke: #66bfbf;
+  stroke-width: 7;
+  stroke-linecap: round;
+  opacity: 0;
+  filter: drop-shadow(0 8px 12px rgba(17, 153, 158, 0.25));
+}
+
+/* ========================= */
+/* Optional speech bubble    */
+/* ========================= */
+
+.guide-bubble {
+  position: absolute;
+  top: 150px;
+  right: 0;
+
+  width: 150px;
+  padding: 12px 14px 10px;
+
+  background-color: #ffffff;
+  border: 2px solid #66bfbf;
+  border-radius: 16px;
+  box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.15);
+
+  font-family: "Montserrat", sans-serif;
+  color: #40514e;
+  text-align: left;
+
+  opacity: 0;
+  transform: translateY(10px);
+
+  pointer-events: auto;
+}
+
+.guide-bubble.visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+.guide-bubble::before {
+  content: "";
+  position: absolute;
+  top: 22px;
+  left: -10px;
+
+  width: 16px;
+  height: 16px;
+
+  background-color: #ffffff;
+  border-left: 2px solid #66bfbf;
+  border-bottom: 2px solid #66bfbf;
+
+  transform: rotate(45deg);
+}
+
+.guide-bubble p {
+  margin: 0;
+  padding-right: 18px;
+
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.guide-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+
+  border: none;
+  background: transparent;
+
+  color: #40514e;
+  font-size: 1.1rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.guide-close:hover {
+  color: #11999e;
+}
+
+.site-guide.hidden {
+  display: none;
+}
+
+/* ========================= */
+/* Mobile adjustment         */
+/* ========================= */
+
+@media (max-width: 768px) {
+  .site-guide {
+    right: 2vw;
+    width: 125px;
+    height: 185px;
+  }
+}
+
+/* ========================= */
+/* Reduced motion            */
+/* ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .guide-stickman {
+    opacity: 1;
+  }
+
+  .guide-floor-line {
+    opacity: 1;
+  }
+
+  .guide-rope-line,
+  .guide-rope-ring {
+    opacity: 0;
+  }
+}
+
 
 
 .top-container {

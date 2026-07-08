@@ -23,6 +23,90 @@
     <a href="pages/contact.html">Contact</a>
   </div>
 
+  <!-- STICKMAN GUIDE -->
+  <div class="site-guide" id="site-guide" aria-label="Website guide">
+    <svg
+      class="guide-svg"
+      viewBox="0 0 180 260"
+      aria-hidden="true"
+    >
+      <!-- Rope -->
+      <line
+        id="guide-rope-line"
+        class="guide-rope-line"
+        x1="90"
+        y1="0"
+        x2="90"
+        y2="0"
+      />
+
+      <!-- Small rope ring -->
+      <circle
+        id="guide-rope-ring"
+        class="guide-rope-ring"
+        cx="90"
+        cy="0"
+        r="7"
+      />
+
+      <!-- Stickman -->
+      <g id="guide-stickman" class="guide-stickman">
+        <!-- Head -->
+        <circle
+          id="guide-head"
+          class="guide-head"
+          cx="90"
+          cy="90"
+          r="16"
+        />
+
+        <!-- Body -->
+        <line id="guide-neck-body" class="guide-line" />
+        <line id="guide-body-hip" class="guide-line" />
+
+        <!-- Left arm -->
+        <line id="guide-left-upper-arm" class="guide-line" />
+        <line id="guide-left-lower-arm" class="guide-line" />
+
+        <!-- Right arm -->
+        <line id="guide-right-upper-arm" class="guide-line" />
+        <line id="guide-right-lower-arm" class="guide-line" />
+
+        <!-- Left leg -->
+        <line id="guide-left-upper-leg" class="guide-line" />
+        <line id="guide-left-lower-leg" class="guide-line" />
+
+        <!-- Right leg -->
+        <line id="guide-right-upper-leg" class="guide-line" />
+        <line id="guide-right-lower-leg" class="guide-line" />
+
+        <!-- Hands and feet -->
+        <circle id="guide-left-hand" class="guide-joint" r="2.7" />
+        <circle id="guide-right-hand" class="guide-joint" r="2.7" />
+        <circle id="guide-left-foot" class="guide-joint" r="2.7" />
+        <circle id="guide-right-foot" class="guide-joint" r="2.7" />
+      </g>
+
+      <!-- Floor -->
+      <line
+        id="guide-floor-line"
+        class="guide-floor-line"
+        x1="52"
+        y1="229"
+        x2="128"
+        y2="229"
+      />
+    </svg>
+
+    <!-- Optional bubble. Leave commented for now. -->
+    <!--
+    <div class="guide-bubble">
+      <button class="guide-close" type="button" aria-label="Hide guide">×</button>
+      <p>Hi! I just dropped in.</p>
+    </div>
+    -->
+  </div>
+
   <div class="middle-container home-container">
     <div class="profile home-profile">
       <h1 class="profile-name">Marçal</h1>
