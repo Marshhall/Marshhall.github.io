@@ -393,6 +393,9 @@ ul {
 
   z-index: 900;
   pointer-events: none;
+  
+  transform-origin: center center;
+  will-change: transform, opacity;
 }
 
 .guide-svg {

@@ -591,6 +591,24 @@ document.addEventListener("DOMContentLoaded", () => {
         return shiftedPose;
     }
 
+    function alignPoseFeetToBoard(pose, footInset = 6) {
+        /*
+        Board center is ny(GUIDE.floorY).
+        The board has stroke thickness, so the feet should touch slightly
+        above the center line, not exactly at the center.
+        */
+        const targetFootY = ny(GUIDE.floorY) - footInset;
+
+        const currentLowestFootY = Math.max(
+            pose.leftFoot.y,
+            pose.rightFoot.y
+        );
+
+        const correctionY = targetFootY - currentLowestFootY;
+
+        return offsetPose(pose, 0, correctionY);
+    }
+
     function createStandingPose({ hip, scale = STICKMAN_SCALE, lean = 0 }) {
         const m = getBodyMeasurements(scale);
         const torso = createTorso({ hip, scale, lean });
@@ -678,6 +696,71 @@ document.addEventListener("DOMContentLoaded", () => {
             rightFoot: rightLeg.end
         };
     }
+
+    const flyingPose = (() => {
+        const m = getBodyMeasurements(STICKMAN_SCALE);
+
+        const torso = createTorso({
+            hip: point(0.45, 0.66),
+            scale: STICKMAN_SCALE,
+            lean: -10
+        });
+
+        const frontArm = createTwoSegmentLimbFromAngles({
+            start: torso.rightShoulder,
+            upperLength: m.upperArm,
+            lowerLength: m.lowerArm,
+            upperAngle: 10,
+            lowerAngle: -10
+        });
+
+        const backArm = createTwoSegmentLimbFromAngles({
+            start: torso.leftShoulder,
+            upperLength: m.upperArm,
+            lowerLength: m.lowerArm,
+            upperAngle: 120,
+            lowerAngle: 180
+        });
+
+        const frontLeg = createTwoSegmentLimbFromAngles({
+            start: torso.hip,
+            upperLength: m.upperLeg,
+            lowerLength: m.lowerLeg,
+            upperAngle: 30,
+            lowerAngle: 60
+        });
+
+        const backLeg = createTwoSegmentLimbFromAngles({
+            start: torso.hip,
+            upperLength: m.upperLeg,
+            lowerLength: m.lowerLeg,
+            upperAngle: 150,
+            lowerAngle: 70
+        });
+
+        const rawPose = {
+            head: torso.head,
+            neck: torso.neck,
+            chest: torso.chest,
+            hip: torso.hip,
+            leftShoulder: torso.leftShoulder,
+            rightShoulder: torso.rightShoulder,
+
+            leftElbow: backArm.joint,
+            leftHand: backArm.end,
+
+            rightElbow: frontArm.joint,
+            rightHand: frontArm.end,
+
+            leftKnee: backLeg.joint,
+            leftFoot: backLeg.end,
+
+            rightKnee: frontLeg.joint,
+            rightFoot: frontLeg.end
+        };
+
+        return alignPoseFeetToBoard(rawPose, 6);
+    })();
 
     function createClimbingPose({
         hip,
@@ -1043,10 +1126,205 @@ document.addEventListener("DOMContentLoaded", () => {
     const CLIMB_CYCLES = 3;
     let animationStartTime = null;
 
+    let guideCanFlyAway = false;
+    let guideHasFlownAway = false;
+    let guideDismissRequested = false;
+
+    function getGuideScrollTrigger() {
+        return Math.max(100, window.innerHeight * 0.15);
+    }
+
+    function flyGuideToNavbar() {
+        if (guideHasFlownAway) return;
+
+        guideHasFlownAway = true;
+
+        ropeLine.style.opacity = "0";
+        ropeRing.style.opacity = "0";
+
+        const startRect = siteGuide.getBoundingClientRect();
+
+        const startX = startRect.left;
+        const startY = startRect.top;
+
+        const endX = window.innerWidth + 80;
+        const endY = -startRect.height - 120;
+
+        const controlX = startX + window.innerWidth * 0.22;
+        const controlY = startY - window.innerHeight * 0.35;
+
+        const poseTransitionDuration = 900;
+        const flightDuration = 2100;
+
+        const takeoffStartTime = performance.now();
+
+        const guideTimeAtTakeoff =
+            performance.now() - animationStartTime;
+
+        const takeoffRotation = -5;
+        const flightRotation = -14;
+
+        siteGuide.style.pointerEvents = "none";
+        siteGuide.style.willChange = "transform, opacity";
+        siteGuide.style.opacity = "1";
+
+        function quadraticBezier(a, b, c, t) {
+            return (
+                (1 - t) * (1 - t) * a +
+                2 * (1 - t) * t * b +
+                t * t * c
+            );
+        }
+
+        function animateTakeoffPose(now) {
+            const rawPoseT = Math.min(
+                (now - takeoffStartTime) / poseTransitionDuration,
+                1
+            );
+
+            const poseT = easeInOut(rawPoseT);
+
+            /*
+            Use one continuous animation clock.
+            This prevents a visual jump between takeoff and flight.
+            */
+            const guideTime =
+                guideTimeAtTakeoff + (now - takeoffStartTime);
+
+            drawHoverPlatform(guideTime);
+
+            const platformMotion = getPlatformMotion(guideTime);
+
+            const pose = interpolatePose(
+                welcomingPose,
+                flyingPose,
+                poseT
+            );
+
+            drawStickman(
+                pose,
+                platformMotion.hover + platformMotion.landingDip,
+                1
+            );
+
+            const rotation =
+                takeoffRotation * poseT;
+
+            /*
+            Important:
+            Use the same transform structure as the flight phase.
+            This avoids a jump when flight begins.
+            */
+            siteGuide.style.transform =
+                `translate(0px, 0px) rotate(${rotation}deg) scale(1)`;
+
+            if (rawPoseT < 1) {
+                requestAnimationFrame(animateTakeoffPose);
+            } else {
+                startFlight(now);
+            }
+        }
+
+        function startFlight(flightStartTime) {
+            function animateFlight(now) {
+                const rawT = Math.min(
+                    (now - flightStartTime) / flightDuration,
+                    1
+                );
+
+                const t = easeInOut(rawT);
+
+                const x = quadraticBezier(startX, controlX, endX, t);
+                const y = quadraticBezier(startY, controlY, endY, t);
+
+                const deltaX = x - startX;
+                const deltaY = y - startY;
+
+                /*
+                Same continuous guide clock as the takeoff phase.
+                No guideTime jump.
+                */
+                const guideTime =
+                    guideTimeAtTakeoff + (now - takeoffStartTime);
+
+                drawHoverPlatform(guideTime);
+
+                const platformMotion = getPlatformMotion(guideTime);
+
+                drawStickman(
+                    flyingPose,
+                    platformMotion.hover + platformMotion.landingDip,
+                    1
+                );
+
+                /*
+                Start from the exact takeoff rotation.
+                Do not jump from -5deg to -14deg instantly.
+                */
+                const rotationBase =
+                    lerp(takeoffRotation, flightRotation, easeOutCubic(rawT));
+
+                const flightTilt =
+                    -4 * Math.sin(Math.PI * t);
+
+                const rotation =
+                    rotationBase + flightTilt;
+
+                const scale =
+                    1 - 0.08 * t;
+
+                const fadeT =
+                    Math.max(0, (rawT - 0.78) / 0.22);
+
+                const opacity =
+                    1 - fadeT;
+
+                siteGuide.style.transform =
+                    `translate(${deltaX}px, ${deltaY}px) rotate(${rotation}deg) scale(${scale})`;
+
+                siteGuide.style.opacity = opacity;
+
+                if (rawT < 1) {
+                    requestAnimationFrame(animateFlight);
+                } else {
+                    siteGuide.classList.add("hidden");
+                }
+            }
+
+            requestAnimationFrame(animateFlight);
+        }
+
+        requestAnimationFrame(animateTakeoffPose);
+    }
+
+
+    function handleGuideScrollAway() {
+        if (guideHasFlownAway) return;
+
+        if (window.scrollY <= getGuideScrollTrigger()) return;
+
+        /*
+        If the user scrolls before the entrance/landing is finished,
+        remember the request, but do not interrupt the rope animation yet.
+        */
+        if (!guideCanFlyAway) {
+            guideDismissRequested = true;
+            return;
+        }
+
+        flyGuideToNavbar();
+    }
+
+    window.addEventListener("scroll", handleGuideScrollAway, {
+        passive: true
+    });
+
     function animateGuide(timestamp) {
         const t = timestamp - animationStartTime;
 
         if (siteGuide.classList.contains("hidden")) return;
+
+        if (guideHasFlownAway) return;
 
         const fullRopeLength = ny(GUIDE.ropeLength);
         let currentRopeLength = 0;
@@ -1128,6 +1406,15 @@ document.addEventListener("DOMContentLoaded", () => {
         drawStickman(currentPose, yOffset, squash);
         drawHoverPlatform(t);
 
+        if (t > GUIDE.standEnd) {
+            guideCanFlyAway = true;
+
+            if (guideDismissRequested || window.scrollY > getGuideScrollTrigger()) {
+                flyGuideToNavbar();
+                return;
+            }
+        }
+
         if (guideBubble && t > GUIDE.bubbleStart) {
             guideBubble.classList.add("visible");
         }
@@ -1138,6 +1425,14 @@ document.addEventListener("DOMContentLoaded", () => {
     function startGuideAnimation(timestamp) {
         animationStartTime = timestamp;
         requestAnimationFrame(animateGuide);
+    }
+
+    if (window.scrollY > getGuideScrollTrigger()) {
+        guideHasFlownAway = true;
+        siteGuide.classList.add("hidden");
+        siteGuide.style.opacity = "0";
+        siteGuide.style.pointerEvents = "none";
+        return;
     }
 
     requestAnimationFrame(startGuideAnimation);
