@@ -483,8 +483,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             stressLines.forEach((line, index) => {
                 const angle = degreesToRadians(index * 60 + time / 40);
-                const inner = NUCLEUS.lobeRadius * 0.55;
-                const outer = inner + tension * 10;
+                const inner = NUCLEUS.lobeRadius * 0.8;
+                const outer = inner + tension * 11.5;
 
                 setLine(
                     line,
