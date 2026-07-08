@@ -14,3 +14,10 @@ Fer que alguna lletra de les localitzacions del CV es converteixi en una cosa t�
 Fer una personeta de pal (tipo animation vs math) que t'acompanyi per la pag web amb objectes tmb (e.g., una galàxia, baixant per una corda). L'estil tipus Measurement de Lockhart, dibuix "a mà". Potser que tingués a vegades vinyetes amb comentaris tipus "What is that about?"
 
 Stickman a About me intentant trencar un àtom (en el requadre on surt W)
+
+Stickman arribant amb la nau espacial a la timeline, baixa, camina per sobre, s'ajup (o gateja) per passar sota el títol, i quan arriba al final, seu amb una cama penjant i l'altra doblegada
+
+Fer que la paraula worldline es deformi com si fos una deformació de l'espai-temps (rela) quan es passa el mouse per sobre (tipus vaca)
+
+Stickman dibuixa l'eix temporal de la worldline
+
