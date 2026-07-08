@@ -473,10 +473,15 @@ ul {
 }
 
 .guide-board-propulsor {
-  fill: #f8fbfb;
-  stroke: #40514e;
-  stroke-width: 1.3;
-  filter: drop-shadow(0 3px 5px rgba(17, 153, 158, 0.25));
+  fill: url("#guide-thrust-outer-gradient");
+  opacity: 0;
+  filter: url("#guide-thrust-glow");
+}
+
+.guide-board-propulsor-core {
+  fill: url("#guide-thrust-core-gradient");
+  opacity: 0;
+  filter: url("#guide-thrust-glow");
 }
 
 .guide-floor-particle {

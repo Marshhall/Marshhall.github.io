@@ -30,6 +30,32 @@
       viewBox="0 0 180 260"
       aria-hidden="true"
     >
+
+      <defs>
+        <!-- Outer cone: orange at the edges, transparent toward the edge -->
+        <linearGradient id="guide-thrust-outer-gradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ff9f1c" stop-opacity="0.85" />
+          <stop offset="65%" stop-color="#ff6b5f" stop-opacity="0.45" />
+          <stop offset="100%" stop-color="#ff6b5f" stop-opacity="0" />
+        </linearGradient>
+
+        <!-- Inner core: hotter red down the center -->
+        <linearGradient id="guide-thrust-core-gradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#fef9c3" stop-opacity="0.9" />
+          <stop offset="35%" stop-color="#ff6b5f" stop-opacity="0.95" />
+          <stop offset="100%" stop-color="#d94f45" stop-opacity="0.15" />
+        </linearGradient>
+
+        <!-- Soft glow around propulsion -->
+        <filter id="guide-thrust-glow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="2.4" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
       <!-- Rope -->
       <path
         id="guide-rope-line"
@@ -106,24 +132,30 @@
           y2="229"
         />
 
-        <!-- Two propulsors/nozzles -->
+        <!-- Cone propulsors -->
         <g id="guide-board-propulsors" class="guide-board-propulsors">
-          <ellipse
+          <path
             id="guide-left-propulsor"
             class="guide-board-propulsor"
-            cx="74"
-            cy="234"
-            rx="7"
-            ry="3.2"
+            d=""
           />
 
-          <ellipse
+          <path
             id="guide-right-propulsor"
             class="guide-board-propulsor"
-            cx="106"
-            cy="234"
-            rx="7"
-            ry="3.2"
+            d=""
+          />
+
+          <path
+            id="guide-left-propulsor-core"
+            class="guide-board-propulsor-core"
+            d=""
+          />
+
+          <path
+            id="guide-right-propulsor-core"
+            class="guide-board-propulsor-core"
+            d=""
           />
         </g>
 

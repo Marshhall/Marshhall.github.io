@@ -161,17 +161,205 @@ document.addEventListener("DOMContentLoaded", () => {
     /* Stickman guide animation  */
     /* ========================= */
 
-    let introFinished = false;
     const siteGuide = document.getElementById("site-guide");
+    if (!siteGuide) return;
 
     const ropeLine = document.getElementById("guide-rope-line");
     const ropeRing = document.getElementById("guide-rope-ring");
     const stickman = document.getElementById("guide-stickman");
+
     const floor = document.getElementById("guide-floor");
     const floorLine = document.getElementById("guide-floor-line");
     const floorGlow = document.getElementById("guide-floor-glow");
-    const leftPropulsor = document.getElementById("guide-left-propulsor");
-    const rightPropulsor = document.getElementById("guide-right-propulsor");
+
+    /*
+      Cone propulsors are created by JavaScript if they are missing from the HTML.
+
+      This prevents the whole guide animation from breaking if your HTML still has
+      the older board markup without:
+        guide-left-propulsor
+        guide-right-propulsor
+        guide-left-propulsor-core
+        guide-right-propulsor-core
+    */
+    const guideSvg = siteGuide.querySelector("svg");
+    const SVG_NS = "http://www.w3.org/2000/svg";
+
+    function ensureGuidePropulsionDefs() {
+        if (!guideSvg) return;
+
+        let defs = guideSvg.querySelector("defs");
+
+        if (!defs) {
+            defs = document.createElementNS(SVG_NS, "defs");
+            guideSvg.insertBefore(defs, guideSvg.firstChild);
+        }
+
+        if (!document.getElementById("guide-thrust-outer-gradient")) {
+            const outerGradient = document.createElementNS(SVG_NS, "linearGradient");
+            outerGradient.setAttribute("id", "guide-thrust-outer-gradient");
+            outerGradient.setAttribute("x1", "0");
+            outerGradient.setAttribute("y1", "0");
+            outerGradient.setAttribute("x2", "0");
+            outerGradient.setAttribute("y2", "1");
+
+            [
+                ["0%", "#ff9f1c", "0.85"],
+                ["55%", "#ff6b5f", "0.48"],
+                ["100%", "#ff6b5f", "0"]
+            ].forEach(([offset, color, opacity]) => {
+                const stop = document.createElementNS(SVG_NS, "stop");
+                stop.setAttribute("offset", offset);
+                stop.setAttribute("stop-color", color);
+                stop.setAttribute("stop-opacity", opacity);
+                outerGradient.appendChild(stop);
+            });
+
+            defs.appendChild(outerGradient);
+        }
+
+        if (!document.getElementById("guide-thrust-core-gradient")) {
+            const coreGradient = document.createElementNS(SVG_NS, "linearGradient");
+            coreGradient.setAttribute("id", "guide-thrust-core-gradient");
+            coreGradient.setAttribute("x1", "0");
+            coreGradient.setAttribute("y1", "0");
+            coreGradient.setAttribute("x2", "0");
+            coreGradient.setAttribute("y2", "1");
+
+            [
+                ["0%", "#fef9c3", "0.75"],
+                ["35%", "#ff6b5f", "0.95"],
+                ["100%", "#d94f45", "0.12"]
+            ].forEach(([offset, color, opacity]) => {
+                const stop = document.createElementNS(SVG_NS, "stop");
+                stop.setAttribute("offset", offset);
+                stop.setAttribute("stop-color", color);
+                stop.setAttribute("stop-opacity", opacity);
+                coreGradient.appendChild(stop);
+            });
+
+            defs.appendChild(coreGradient);
+        }
+
+        if (!document.getElementById("guide-thrust-glow")) {
+            const filter = document.createElementNS(SVG_NS, "filter");
+            filter.setAttribute("id", "guide-thrust-glow");
+            filter.setAttribute("x", "-80%");
+            filter.setAttribute("y", "-80%");
+            filter.setAttribute("width", "260%");
+            filter.setAttribute("height", "260%");
+
+            const blur = document.createElementNS(SVG_NS, "feGaussianBlur");
+            blur.setAttribute("stdDeviation", "2.4");
+            blur.setAttribute("result", "blur");
+
+            const merge = document.createElementNS(SVG_NS, "feMerge");
+
+            const blurNode = document.createElementNS(SVG_NS, "feMergeNode");
+            blurNode.setAttribute("in", "blur");
+
+            const sourceNode = document.createElementNS(SVG_NS, "feMergeNode");
+            sourceNode.setAttribute("in", "SourceGraphic");
+
+            merge.appendChild(blurNode);
+            merge.appendChild(sourceNode);
+            filter.appendChild(blur);
+            filter.appendChild(merge);
+
+            defs.appendChild(filter);
+        }
+    }
+
+    function ensurePathElement(id, className) {
+        let element = document.getElementById(id);
+
+        /*
+          If an older version used <ellipse> for this id, replace it with <path>.
+          A cone flame needs a path because we animate the d attribute.
+        */
+        if (element && element.tagName.toLowerCase() !== "path") {
+            element.remove();
+            element = null;
+        }
+
+        if (!element) {
+            element = document.createElementNS(SVG_NS, "path");
+            element.setAttribute("id", id);
+            element.setAttribute("class", className);
+        }
+
+        return element;
+    }
+
+    function ensureConePropulsors() {
+        ensureGuidePropulsionDefs();
+
+        const particlesGroup = document.getElementById("guide-floor-particles");
+
+        let propulsorGroup = document.getElementById("guide-board-propulsors");
+
+        if (!propulsorGroup) {
+            propulsorGroup = document.createElementNS(SVG_NS, "g");
+            propulsorGroup.setAttribute("id", "guide-board-propulsors");
+            propulsorGroup.setAttribute("class", "guide-board-propulsors");
+
+            if (particlesGroup) {
+                floor.insertBefore(propulsorGroup, particlesGroup);
+            } else {
+                floor.appendChild(propulsorGroup);
+            }
+        }
+
+        const leftOuter = ensurePathElement(
+            "guide-left-propulsor",
+            "guide-board-propulsor"
+        );
+
+        const rightOuter = ensurePathElement(
+            "guide-right-propulsor",
+            "guide-board-propulsor"
+        );
+
+        const leftCore = ensurePathElement(
+            "guide-left-propulsor-core",
+            "guide-board-propulsor-core"
+        );
+
+        const rightCore = ensurePathElement(
+            "guide-right-propulsor-core",
+            "guide-board-propulsor-core"
+        );
+
+        [leftOuter, rightOuter, leftCore, rightCore].forEach((path) => {
+            if (!propulsorGroup.contains(path)) {
+                propulsorGroup.appendChild(path);
+            }
+        });
+
+        leftOuter.setAttribute("fill", "url(#guide-thrust-outer-gradient)");
+        rightOuter.setAttribute("fill", "url(#guide-thrust-outer-gradient)");
+        leftCore.setAttribute("fill", "url(#guide-thrust-core-gradient)");
+        rightCore.setAttribute("fill", "url(#guide-thrust-core-gradient)");
+
+        [leftOuter, rightOuter, leftCore, rightCore].forEach((path) => {
+            path.setAttribute("filter", "url(#guide-thrust-glow)");
+            path.style.opacity = "0";
+        });
+
+        return {
+            leftOuter,
+            rightOuter,
+            leftCore,
+            rightCore
+        };
+    }
+
+    const conePropulsors = ensureConePropulsors();
+
+    const leftPropulsor = conePropulsors.leftOuter;
+    const rightPropulsor = conePropulsors.rightOuter;
+    const leftPropulsorCore = conePropulsors.leftCore;
+    const rightPropulsorCore = conePropulsors.rightCore;
 
     const floorParticles = [
         document.getElementById("guide-floor-particle-1"),
@@ -182,23 +370,19 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("guide-floor-particle-6"),
         document.getElementById("guide-floor-particle-7"),
         document.getElementById("guide-floor-particle-8")
-    ];
+    ].filter(Boolean);
 
     const head = document.getElementById("guide-head");
-
     const neckBody = document.getElementById("guide-neck-body");
     const bodyHip = document.getElementById("guide-body-hip");
-
     const leftUpperArm = document.getElementById("guide-left-upper-arm");
     const leftLowerArm = document.getElementById("guide-left-lower-arm");
     const rightUpperArm = document.getElementById("guide-right-upper-arm");
     const rightLowerArm = document.getElementById("guide-right-lower-arm");
-
     const leftUpperLeg = document.getElementById("guide-left-upper-leg");
     const leftLowerLeg = document.getElementById("guide-left-lower-leg");
     const rightUpperLeg = document.getElementById("guide-right-upper-leg");
     const rightLowerLeg = document.getElementById("guide-right-lower-leg");
-
     const leftHand = document.getElementById("guide-left-hand");
     const rightHand = document.getElementById("guide-right-hand");
     const leftFoot = document.getElementById("guide-left-foot");
@@ -207,79 +391,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const guideBubble = document.querySelector(".guide-bubble");
     const guideCloseButton = document.querySelector(".guide-close");
 
-    /* ========================= */
-    /* SVG coordinate system     */
-    /* ========================= */
+    const SVG = { width: 180, height: 260 };
 
-    /*
-    The SVG has viewBox="0 0 180 260".
-
-    But below, most positions are written in normalized coordinates.
-
-    x = 0 means left edge of SVG
-    x = 1 means right edge of SVG
-
-    y = 0 means top edge of SVG
-    y = 1 means bottom edge of SVG
-
-    So point(0.5, 0.5) is the center of the SVG.
-    */
-
-    const SVG = {
-        width: 180,
-        height: 260
-    };
-
-    function point(x, y) {
-        return {
-            x: x * SVG.width,
-            y: y * SVG.height
-        };
-    }
-
-    function nx(x) {
-        return x * SVG.width;
-    }
-
-    function ny(y) {
-        return y * SVG.height;
-    }
-
-    function relativeLength(value, scale = 1) {
-        return value * SVG.height * scale;
-    }
-
-    /* ========================= */
-    /* Body proportions          */
-    /* ========================= */
-
-    /*
-    These values define the stickman proportions.
-
-    They are relative to the SVG height, not raw pixels.
-
-    To make the stickman bigger or smaller inside the SVG,
-    change STICKMAN_SCALE below.
-    */
+    function point(x, y) { return { x: x * SVG.width, y: y * SVG.height }; }
+    function nx(x) { return x * SVG.width; }
+    function ny(y) { return y * SVG.height; }
+    function relativeLength(value, scale = 1) { return value * SVG.height * scale; }
 
     const STICKMAN_SCALE = 0.82;
 
     const BODY = {
         headRadius: 0.062,
-        neckLength: 0.01, /*0.035,*/
+        neckLength: 0.01,
         torsoLength: 0.17,
         shoulderWidth: 0,
-
         upperArm: 0.105,
         lowerArm: 0.105,
-
         upperLeg: 0.125,
         lowerLeg: 0.125
     };
-
-    /* ========================= */
-    /* Animation settings        */
-    /* ========================= */
 
     const TIMING = {
         ropeFall: 1850,
@@ -304,8 +434,7 @@ document.addEventListener("DOMContentLoaded", () => {
         timeline.ropeSettleEnd = timeline.ropeSettleStart + timing.ropeSettle;
 
         timeline.ropeClimbBlendStart = timeline.ropeSettleEnd;
-        timeline.ropeClimbBlendEnd =
-            timeline.ropeClimbBlendStart + timing.ropeClimbBlend;
+        timeline.ropeClimbBlendEnd = timeline.ropeClimbBlendStart + timing.ropeClimbBlend;
 
         timeline.climbStart = timeline.ropeClimbBlendEnd;
         timeline.climbEnd = timeline.climbStart + timing.climb;
@@ -319,14 +448,9 @@ document.addEventListener("DOMContentLoaded", () => {
         timeline.greetStart = timeline.standEnd;
         timeline.greetEnd = timeline.greetStart + timing.greet;
 
-        timeline.ropeRetractStart =
-            timeline.greetEnd + timing.pauseBeforeRopeRetract;
-
-        timeline.ropeRetractEnd =
-            timeline.ropeRetractStart + timing.ropeRetract;
-
-        timeline.bubbleStart =
-            timeline.ropeRetractEnd + timing.bubbleDelay;
+        timeline.ropeRetractStart = timeline.greetEnd + timing.pauseBeforeRopeRetract;
+        timeline.ropeRetractEnd = timeline.ropeRetractStart + timing.ropeRetract;
+        timeline.bubbleStart = timeline.ropeRetractEnd + timing.bubbleDelay;
 
         return timeline;
     }
@@ -338,60 +462,16 @@ document.addEventListener("DOMContentLoaded", () => {
         ...createTimeline(TIMING)
     };
 
-
-    /* ========================= */
-    /* Utility functions         */
-    /* ========================= */
-
-    function clamp(value, min, max) {
-        return Math.max(min, Math.min(max, value));
-    }
-
-    function progress(time, start, end) {
-        return clamp((time - start) / (end - start), 0, 1);
-    }
-
-    function easeInOut(t) {
-        return t < 0.5
-            ? 4 * t * t * t
-            : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    }
-
-    function easeOutBack(t) {
-        const c1 = 1.70158;
-        const c3 = c1 + 1;
-
-        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-    }
-
-    function lerp(a, b, t) {
-        return a + (b - a) * t;
-    }
-
-    function lerpPoint(a, b, t) {
-        return {
-            x: lerp(a.x, b.x, t),
-            y: lerp(a.y, b.y, t)
-        };
-    }
-
-    function add(a, b) {
-        return {
-            x: a.x + b.x,
-            y: a.y + b.y
-        };
-    }
-
-    function vectorFromAngle(angleRadians, length) {
-        return {
-            x: Math.cos(angleRadians) * length,
-            y: Math.sin(angleRadians) * length
-        };
-    }
-
-    function degreesToRadians(degrees) {
-        return (degrees * Math.PI) / 180;
-    }
+    function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
+    function progress(time, start, end) { return clamp((time - start) / (end - start), 0, 1); }
+    function easeInOut(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+    function easeInQuad(t) { return t * t; }
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function lerpPoint(a, b, t) { return { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t) }; }
+    function add(a, b) { return { x: a.x + b.x, y: a.y + b.y }; }
+    function vectorFromAngle(angleRadians, length) { return { x: Math.cos(angleRadians) * length, y: Math.sin(angleRadians) * length }; }
+    function degreesToRadians(degrees) { return (degrees * Math.PI) / 180; }
 
     function setLine(line, a, b) {
         line.setAttribute("x1", a.x);
@@ -407,71 +487,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function interpolatePose(a, b, t) {
         const result = {};
-
-        Object.keys(a).forEach((key) => {
+        Object.keys(a).forEach(key => {
             result[key] = lerpPoint(a[key], b[key], t);
         });
-
         return result;
-    }
-
-    function easeInQuad(t) {
-        return t * t;
-    }
-
-    function easeOutCubic(t) {
-        return 1 - Math.pow(1 - t, 3);
-    }
-
-    function dampedSwing({
-        time,
-        startTime,
-        duration,
-        initialAngle,
-        frequency = 2.5,
-        damping = 3.2
-    }) {
-        /*
-        Returns a pendulum-like angle.
-
-        time and startTime are in milliseconds.
-        duration is in milliseconds.
-        initialAngle is in radians.
-
-        The formula is:
-            angle = initialAngle * e^(-damping * t) * cos(frequency * t)
-
-        where t is normalized-ish time in seconds.
-        */
-
-        const elapsed = Math.max(0, time - startTime) / 1000;
-        const normalized = clamp((time - startTime) / duration, 0, 1);
-
-        const decay = Math.exp(-damping * normalized);
-        const oscillation = Math.cos(frequency * Math.PI * 2 * elapsed);
-
-        return initialAngle * decay * oscillation;
     }
 
     function ropeSwingAngle(time) {
         const initialAngle = -0.42;
-
         const swingStart = GUIDE.ropeFallStart;
         const swingEnd = GUIDE.ropeClimbBlendEnd;
-
         const elapsed = Math.max(0, time - swingStart) / 1000;
         const u = progress(time, swingStart, swingEnd);
-
         const damping = 3.4;
         const decay = Math.exp(-damping * u);
-
         const frequency = 1.65;
         const oscillation = Math.cos(2 * Math.PI * frequency * elapsed);
-
-        const fallVisibility = easeOutCubic(
-            progress(time, GUIDE.ropeFallStart, GUIDE.ropeFallEnd)
-        );
-
+        const fallVisibility = easeOutCubic(progress(time, GUIDE.ropeFallStart, GUIDE.ropeFallEnd));
         return initialAngle * decay * oscillation * fallVisibility;
     }
 
@@ -480,16 +512,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function getLandingMoment() {
-        return lerp(
-            GUIDE.standStart,
-            GUIDE.standEnd,
-            0.72
-        );
+        return lerp(GUIDE.standStart, GUIDE.standEnd, 0.72);
     }
-
-    /* ========================= */
-    /* Body-building helpers     */
-    /* ========================= */
 
     function getBodyMeasurements(scale = STICKMAN_SCALE) {
         return {
@@ -497,347 +521,108 @@ document.addEventListener("DOMContentLoaded", () => {
             neckLength: relativeLength(BODY.neckLength, scale),
             torsoLength: relativeLength(BODY.torsoLength, scale),
             shoulderWidth: relativeLength(BODY.shoulderWidth, scale),
-
             upperArm: relativeLength(BODY.upperArm, scale),
             lowerArm: relativeLength(BODY.lowerArm, scale),
-
             upperLeg: relativeLength(BODY.upperLeg, scale),
             lowerLeg: relativeLength(BODY.lowerLeg, scale)
         };
     }
 
-    /*
-    This creates the stable torso geometry from only:
-    - hip position
-    - scale
-    - lean
-
-    Lean is in degrees.
-    Positive lean moves the upper body to the right.
-    Negative lean moves it to the left.
-    */
-
     function createTorso({ hip, scale = STICKMAN_SCALE, lean = 0 }) {
         const m = getBodyMeasurements(scale);
-
         const leanRadians = degreesToRadians(lean);
 
-        const torsoVector = vectorFromAngle(
-            -Math.PI / 2 + leanRadians,
-            m.torsoLength
-        );
-
+        const torsoVector = vectorFromAngle(-Math.PI / 2 + leanRadians, m.torsoLength);
         const chest = add(hip, torsoVector);
 
-        const neckVector = vectorFromAngle(
-            -Math.PI / 2 + leanRadians,
-            m.neckLength
-        );
-
+        const neckVector = vectorFromAngle(-Math.PI / 2 + leanRadians, m.neckLength);
         const neck = add(chest, neckVector);
 
-        const head = add(
-            neck,
-            vectorFromAngle(-Math.PI / 2 + leanRadians, m.headRadius)
-        );
-
-        /*
-            Shoulders are perpendicular to the torso direction.
-        */
+        const head = add(neck, vectorFromAngle(-Math.PI / 2 + leanRadians, m.headRadius));
 
         const shoulderAngle = leanRadians;
         const shoulderVector = vectorFromAngle(shoulderAngle, m.shoulderWidth / 2);
 
-        const leftShoulder = {
-            x: chest.x - shoulderVector.x,
-            y: chest.y - shoulderVector.y
-        };
+        const leftShoulder = { x: chest.x - shoulderVector.x, y: chest.y - shoulderVector.y };
+        const rightShoulder = { x: chest.x + shoulderVector.x, y: chest.y + shoulderVector.y };
 
-        const rightShoulder = {
-            x: chest.x + shoulderVector.x,
-            y: chest.y + shoulderVector.y
-        };
-
-        return {
-            head,
-            neck,
-            chest,
-            hip,
-            leftShoulder,
-            rightShoulder
-        };
+        return { head, neck, chest, hip, leftShoulder, rightShoulder };
     }
-
-    /*
-    This creates a bent limb between a start point and an end point.
-
-    Example:
-        shoulder -> elbow -> hand
-
-    The bend controls which side the elbow/knee bends toward.
-
-    bend = 1 bends one way
-    bend = -1 bends the other way
-    */
 
     function createBentLimb(start, end, upperLength, lowerLength, bend = 1) {
         const dx = end.x - start.x;
         const dy = end.y - start.y;
-
         const distance = Math.sqrt(dx * dx + dy * dy);
-
-        /*
-            If the target is too far away for the limb lengths,
-            clamp it so the geometry still works.
-        */
+        if (distance === 0) return { x: start.x, y: start.y };
 
         const maxReach = upperLength + lowerLength - 0.001;
         const safeDistance = Math.min(distance, maxReach);
-
         const ux = dx / distance;
         const uy = dy / distance;
 
-        /*
-            Law of cosines:
-            distance from start to the projection of the elbow
-            along the start-end line.
-        */
-
-        const a =
-            (upperLength * upperLength -
-            lowerLength * lowerLength +
-            safeDistance * safeDistance) /
-            (2 * safeDistance);
-
+        const a = (upperLength * upperLength - lowerLength * lowerLength + safeDistance * safeDistance) / (2 * safeDistance);
         const hSquared = Math.max(upperLength * upperLength - a * a, 0);
         const h = Math.sqrt(hSquared);
 
-        const mid = {
-            x: start.x + ux * a,
-            y: start.y + uy * a
-        };
-
-        /*
-            Perpendicular direction.
-        */
-
+        const mid = { x: start.x + ux * a, y: start.y + uy * a };
         const px = -uy;
         const py = ux;
 
-        const joint = {
-            x: mid.x + px * h * bend,
-            y: mid.y + py * h * bend
-        };
-
-    return joint;
+        return { x: mid.x + px * h * bend, y: mid.y + py * h * bend };
     }
 
-    function createTwoSegmentLimbFromAngles({
-        start,
-        upperLength,
-        lowerLength,
-        upperAngle,
-        lowerAngle
-    }) {
-        const joint = add(
-            start,
-            vectorFromAngle(degreesToRadians(upperAngle), upperLength)
-        );
-
-        const end = add(
-            joint,
-            vectorFromAngle(degreesToRadians(lowerAngle), lowerLength)
-        );
-
-        return {
-            joint,
-            end
-        };
+    function createTwoSegmentLimbFromAngles({ start, upperLength, lowerLength, upperAngle, lowerAngle }) {
+        const joint = add(start, vectorFromAngle(degreesToRadians(upperAngle), upperLength));
+        const end = add(joint, vectorFromAngle(degreesToRadians(lowerAngle), lowerLength));
+        return { joint, end };
     }
-
-    /* ========================= */
-    /* Pose builders             */
-    /* ========================= */
 
     function offsetPose(pose, offsetX, offsetY) {
         const shiftedPose = {};
-
-        Object.keys(pose).forEach((key) => {
-            shiftedPose[key] = {
-                x: pose[key].x + offsetX,
-                y: pose[key].y + offsetY
-            };
+        Object.keys(pose).forEach(key => {
+            shiftedPose[key] = { x: pose[key].x + offsetX, y: pose[key].y + offsetY };
         });
-
         return shiftedPose;
     }
 
-    /*
-    Standing pose:
-    You only give the hip position and scale.
-
-    The helper calculates:
-    - head
-    - neck
-    - chest
-    - shoulders
-    - elbows
-    - hands
-    - knees
-    - feet
-    */
-
-    function createStandingPose({
-        hip,
-        scale = STICKMAN_SCALE,
-        lean = 0
-        }) {
+    function createStandingPose({ hip, scale = STICKMAN_SCALE, lean = 0 }) {
         const m = getBodyMeasurements(scale);
         const torso = createTorso({ hip, scale, lean });
 
-        const leftHand = add(
-            torso.leftShoulder,
-            vectorFromAngle(degreesToRadians(130), m.upperArm + m.lowerArm)
-        );
+        const leftHandPoint = add(torso.leftShoulder, vectorFromAngle(degreesToRadians(130), m.upperArm + m.lowerArm));
+        const rightHandPoint = add(torso.rightShoulder, vectorFromAngle(degreesToRadians(50), m.upperArm + m.lowerArm));
 
-        const rightHand = add(
-            torso.rightShoulder,
-            vectorFromAngle(degreesToRadians(50), m.upperArm + m.lowerArm)
-        );
+        const leftElbow = createBentLimb(torso.leftShoulder, leftHandPoint, m.upperArm, m.lowerArm, -1);
+        const rightElbow = createBentLimb(torso.rightShoulder, rightHandPoint, m.upperArm, m.lowerArm, 1);
 
-        const leftElbow = createBentLimb(
-            torso.leftShoulder,
-            leftHand,
-            m.upperArm,
-            m.lowerArm,
-            -1
-        );
+        const leftFootPoint = add(hip, vectorFromAngle(degreesToRadians(105), m.upperLeg + m.lowerLeg));
+        const rightFootPoint = add(hip, vectorFromAngle(degreesToRadians(75), m.upperLeg + m.lowerLeg));
 
-        const rightElbow = createBentLimb(
-            torso.rightShoulder,
-            rightHand,
-            m.upperArm,
-            m.lowerArm,
-            1
-        );
-
-        const leftFoot = add(
-            hip,
-            vectorFromAngle(degreesToRadians(105), m.upperLeg + m.lowerLeg)
-        );
-
-        const rightFoot = add(
-            hip,
-            vectorFromAngle(degreesToRadians(75), m.upperLeg + m.lowerLeg)
-        );
-
-        const leftKnee = createBentLimb(
-            hip,
-            leftFoot,
-            m.upperLeg,
-            m.lowerLeg,
-            -1
-        );
-
-        const rightKnee = createBentLimb(
-            hip,
-            rightFoot,
-            m.upperLeg,
-            m.lowerLeg,
-            1
-        );
+        const leftKnee = createBentLimb(hip, leftFootPoint, m.upperLeg, m.lowerLeg, -1);
+        const rightKnee = createBentLimb(hip, rightFootPoint, m.upperLeg, m.lowerLeg, 1);
 
         return {
             head: torso.head,
             neck: torso.neck,
             chest: torso.chest,
             hip: torso.hip,
-
             leftShoulder: torso.leftShoulder,
             rightShoulder: torso.rightShoulder,
-
             leftElbow,
-            leftHand,
-
+            leftHand: leftHandPoint,
             rightElbow,
-            rightHand,
-
+            rightHand: rightHandPoint,
             leftKnee,
-            leftFoot,
-
+            leftFoot: leftFootPoint,
             rightKnee,
-            rightFoot
+            rightFoot: rightFootPoint
         };
     }
 
-
-    function createGreetingPose({
-        hip,
-        scale = STICKMAN_SCALE,
-        lean = 0,
-        wavingSide = "right"
-    }) {
-        const pose = createStandingPose({ hip, scale, lean });
+    function createWelcomingPose({ hip, scale = STICKMAN_SCALE, lean = -2 }) {
         const m = getBodyMeasurements(scale);
-
-        /*
-        We start from the standing pose, then override one arm.
-
-        If the stickman is facing us:
-        - its right arm appears on the viewer's left/right depending on your naming convention.
-        - Here I use rightArm = guide's right arm.
-        */
-
-        if (wavingSide === "right") {
-            pose.rightElbow = {
-                x: pose.rightShoulder.x + relativeLength(0.06, scale),
-                y: pose.rightShoulder.y - relativeLength(0.035, scale)
-            };
-
-            pose.rightHand = {
-                x: pose.rightElbow.x + relativeLength(0.035, scale),
-                y: pose.rightElbow.y - relativeLength(0.075, scale)
-            };
-        } else {
-            pose.leftElbow = {
-                x: pose.leftShoulder.x - relativeLength(0.06, scale),
-                y: pose.leftShoulder.y - relativeLength(0.035, scale)
-            };
-
-            pose.leftHand = {
-                x: pose.leftElbow.x - relativeLength(0.035, scale),
-                y: pose.leftElbow.y - relativeLength(0.075, scale)
-            };
-        }
-
-        return pose;
-    }
-
-    function createWelcomingPose({
-        hip,
-        scale = STICKMAN_SCALE,
-        lean = -2
-    }) {
-        const m = getBodyMeasurements(scale);
-
-        /*
-        Torso and head still respect:
-        neckLength, torsoLength, headRadius.
-        */
         const torso = createTorso({ hip, scale, lean });
 
-        /*
-        For this pose, both arms attach near the chest because
-        shoulderWidth is 0 in your BODY settings.
-        */
-
-        /*
-        Screen-left arm:
-        hand-on-hip style.
-
-        The upper arm goes down-left.
-        The lower arm folds inward toward the hip.
-        */
         const leftArm = createTwoSegmentLimbFromAngles({
             start: torso.leftShoulder,
             upperLength: m.upperArm,
@@ -846,13 +631,6 @@ document.addEventListener("DOMContentLoaded", () => {
             lowerAngle: 70
         });
 
-        /*
-        Screen-right arm:
-        raised greeting arm.
-
-        The upper arm goes out-right.
-        The lower arm curves upward.
-        */
         const rightArm = createTwoSegmentLimbFromAngles({
             start: torso.rightShoulder,
             upperLength: m.upperArm,
@@ -861,10 +639,6 @@ document.addEventListener("DOMContentLoaded", () => {
             lowerAngle: -85
         });
 
-        /*
-        Legs:
-        wide, confident stance while preserving leg lengths.
-        */
         const leftLeg = createTwoSegmentLimbFromAngles({
             start: torso.hip,
             upperLength: m.upperLeg,
@@ -886,41 +660,18 @@ document.addEventListener("DOMContentLoaded", () => {
             neck: torso.neck,
             chest: torso.chest,
             hip: torso.hip,
-
             leftShoulder: torso.leftShoulder,
             rightShoulder: torso.rightShoulder,
-
             leftElbow: leftArm.joint,
             leftHand: leftArm.end,
-
             rightElbow: rightArm.joint,
             rightHand: rightArm.end,
-
             leftKnee: leftLeg.joint,
             leftFoot: leftLeg.end,
-
             rightKnee: rightLeg.joint,
             rightFoot: rightLeg.end
         };
     }
-
-    /*
-    Climbing pose:
-    You give:
-    - hip
-    - ropeX
-    - leftHandY
-    - rightHandY
-    - foot positions
-
-    The hands are automatically constrained to the rope.
-
-    This means:
-        leftHand.x = ropeX
-        rightHand.x = ropeX
-
-    So the guide cannot accidentally stop touching the rope.
-    */
 
     function createClimbingPose({
         hip,
@@ -935,90 +686,45 @@ document.addEventListener("DOMContentLoaded", () => {
         rightArmBend = 1,
         leftLegBend = -1,
         rightLegBend = 1
-        }) {
+    }) {
         const m = getBodyMeasurements(scale);
         const torso = createTorso({ hip, scale, lean });
 
         const leftHandPoint = point(ropeX, leftHandY);
         const rightHandPoint = point(ropeX, rightHandY);
 
-        const leftElbow = createBentLimb(
-            torso.leftShoulder,
-            leftHandPoint,
-            m.upperArm,
-            m.lowerArm,
-            leftArmBend
-        );
-
-        const rightElbow = createBentLimb(
-            torso.rightShoulder,
-            rightHandPoint,
-            m.upperArm,
-            m.lowerArm,
-            rightArmBend
-        );
-
-        const leftKnee = createBentLimb(
-            hip,
-            leftFoot,
-            m.upperLeg,
-            m.lowerLeg,
-            leftLegBend
-        );
-
-        const rightKnee = createBentLimb(
-            hip,
-            rightFoot,
-            m.upperLeg,
-            m.lowerLeg,
-            rightLegBend
-        );
+        const leftElbow = createBentLimb(torso.leftShoulder, leftHandPoint, m.upperArm, m.lowerArm, leftArmBend);
+        const rightElbow = createBentLimb(torso.rightShoulder, rightHandPoint, m.upperArm, m.lowerArm, rightArmBend);
+        const leftKnee = createBentLimb(hip, leftFoot, m.upperLeg, m.lowerLeg, leftLegBend);
+        const rightKnee = createBentLimb(hip, rightFoot, m.upperLeg, m.lowerLeg, rightLegBend);
 
         return {
             head: torso.head,
             neck: torso.neck,
             chest: torso.chest,
             hip: torso.hip,
-
             leftShoulder: torso.leftShoulder,
             rightShoulder: torso.rightShoulder,
-
             leftElbow,
             leftHand: leftHandPoint,
-
             rightElbow,
             rightHand: rightHandPoint,
-
             leftKnee,
             leftFoot,
-
             rightKnee,
             rightFoot
         };
     }
-
-    /* ========================= */
-    /* Poses                     */
-    /* ========================= */
-
-    /*
-    To move the guide around inside the SVG, edit only these hip positions.
-
-    To make the guide smaller/larger inside the SVG, edit STICKMAN_SCALE.
-    */
 
     const climbingPoseA = createClimbingPose({
         hip: point(0.61, 0.65),
         ropeX: GUIDE.ropeX,
         leftHandY: 0.34,
         rightHandY: 0.52,
-
         leftFoot: point(0.43, 0.80),
         rightFoot: point(0.78, 0.76),
-
         scale: STICKMAN_SCALE,
         lean: -8,
-
         leftArmBend: -1,
         rightArmBend: -1,
         leftLegBend: -1,
@@ -1030,13 +736,10 @@ document.addEventListener("DOMContentLoaded", () => {
         ropeX: GUIDE.ropeX,
         leftHandY: 0.42,
         rightHandY: 0.46,
-
         leftFoot: point(0.75, 0.78),
         rightFoot: point(0.42, 0.82),
-
         scale: STICKMAN_SCALE,
         lean: -5,
-
         leftArmBend: -1,
         rightArmBend: -1,
         leftLegBend: 1,
@@ -1044,18 +747,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const climbStartYOffset = -ny(0.23);
-
-    const highClimbingPoseA = offsetPose(
-        climbingPoseA,
-        0,
-        climbStartYOffset
-    );
-
-    const highClimbingPoseB = offsetPose(
-        climbingPoseB,
-        0,
-        climbStartYOffset
-    );
+    const highClimbingPoseA = offsetPose(climbingPoseA, 0, climbStartYOffset);
+    const highClimbingPoseB = offsetPose(climbingPoseB, 0, climbStartYOffset);
 
     const standingPose = createStandingPose({
         hip: point(0.5, 0.66),
@@ -1063,31 +756,14 @@ document.addEventListener("DOMContentLoaded", () => {
         lean: 0
     });
 
-    const greetingPose = createGreetingPose({
+    const welcomingPose = createWelcomingPose({
         hip: point(0.5, 0.66),
         scale: STICKMAN_SCALE,
-        lean: 0,
-        wavingSide: "left"
+        lean: -2
     });
 
-    const welcomingPose = createWelcomingPose({
-    hip: point(0.5, 0.66),
-    scale: STICKMAN_SCALE,
-    lean: -2,
-});
-
-    /* ========================= */
-    /* Drawing                   */
-    /* ========================= */
-
     function drawStickman(pose, yOffset, squash) {
-        /*
-            yOffset moves the whole stickman up/down.
-            squash gives the small landing compression.
-        */
-
         const hipForSquash = pose.hip;
-
         const transform = `
             translate(0 ${yOffset})
             translate(${hipForSquash.x} ${hipForSquash.y})
@@ -1098,22 +774,16 @@ document.addEventListener("DOMContentLoaded", () => {
         stickman.setAttribute("transform", transform);
 
         setCircle(head, pose.head);
-
         setLine(neckBody, pose.neck, pose.chest);
         setLine(bodyHip, pose.chest, pose.hip);
-
         setLine(leftUpperArm, pose.leftShoulder, pose.leftElbow);
         setLine(leftLowerArm, pose.leftElbow, pose.leftHand);
-
         setLine(rightUpperArm, pose.rightShoulder, pose.rightElbow);
         setLine(rightLowerArm, pose.rightElbow, pose.rightHand);
-
         setLine(leftUpperLeg, pose.hip, pose.leftKnee);
         setLine(leftLowerLeg, pose.leftKnee, pose.leftFoot);
-
         setLine(rightUpperLeg, pose.hip, pose.rightKnee);
         setLine(rightLowerLeg, pose.rightKnee, pose.rightFoot);
-
         setCircle(leftHand, pose.leftHand);
         setCircle(rightHand, pose.rightHand);
         setCircle(leftFoot, pose.leftFoot);
@@ -1122,312 +792,77 @@ document.addEventListener("DOMContentLoaded", () => {
         head.setAttribute("r", getBodyMeasurements(STICKMAN_SCALE).headRadius);
     }
 
-       function drawPlatformParticles({
-        time,
-        leftEmitter,
-        rightEmitter,
-        platformVisible
-    }) {
-        const landingMoment = getLandingMoment();
-
-        /*
-        Ease in before the stickman lands.
-        */
-        const preLandingT = easeInOut(
-            progress(
-                time,
-                landingMoment - 700,
-                landingMoment
-            )
-        );
-
-        /*
-        Long calm-down after landing.
-        Your current timing was 6000 -> 12000, so this respects that idea.
-        */
-        const thrustFadeT = easeInOut(
-            progress(
-                time,
-                landingMoment + 6000,
-                landingMoment + 12000
-            )
-        );
-
-        const sustainedThrust =
-            preLandingT * (1 - thrustFadeT);
-
-        const engineStrength =
-            Math.min(1, platformVisible * 3);
-
-        /*
-        Permanent final visibility level.
-        This keeps the idle propulsion visible after the calm-down.
-        */
-        const idleBase = 0.52;
-
-        const idleIntensity =
-            engineStrength *
-            lerp(0.16, idleBase, preLandingT);
-
-        /*
-        Extra particles for landing thrust.
-        This fades away after the long calm-down.
-        */
-        const extraParticleIntensity =
-            engineStrength *
-            sustainedThrust *
-            0.95;
-
-        floorParticles.forEach((particle, index) => {
-            const isExtraParticle = index >= 4;
-
-            /*
-            Alternate particles between the two propulsors:
-            even index -> left propulsor
-            odd index  -> right propulsor
-            */
-            const emitter =
-                index % 2 === 0
-                    ? leftEmitter
-                    : rightEmitter;
-
-            /*
-            A tiny horizontal spread so particles do not fall in a perfect line.
-            */
-            const side =
-                index % 2 === 0
-                    ? -1
-                    : 1;
-
-            const speed = isExtraParticle ? 420 : 650;
-
-            const phase =
-                (time / speed + index * 0.19) % 1;
-
-            const wiggle =
-                Math.sin(time / 180 + index * 1.7) * 2.2;
-
-            const drift =
-                side * phase * 2.5;
-
-            const particleX =
-                emitter.x + wiggle + drift;
-
-            const travelDistance =
-                isExtraParticle ? 30 : 22;
-
-            const particleY =
-                emitter.y + 4 + phase * travelDistance;
-
-            const fade =
-                Math.sin(Math.PI * phase);
-
-            let opacity;
-
-            if (isExtraParticle) {
-                /*
-                Extra particles appear during the stronger landing thrust.
-                */
-                opacity =
-                    fade *
-                    extraParticleIntensity;
-            } else {
-                /*
-                Base particles continue forever.
-                */
-                opacity =
-                    fade *
-                    idleIntensity;
-            }
-
-            /*
-            Fixed size. Intensity comes from more particles and opacity,
-            not from making them bigger.
-            */
-            particle.setAttribute("cx", particleX);
-            particle.setAttribute("cy", particleY);
-            particle.setAttribute("r", "1.7");
-
-            particle.style.opacity = opacity;
-        });
-    }
-
     function drawRope(length, time) {
         const anchorX = nx(GUIDE.ropeX);
         const anchorY = 0;
-
-        const retractT = progress(
-            time,
-            GUIDE.ropeRetractStart,
-            GUIDE.ropeRetractEnd
-        );
+        const retractT = progress(time, GUIDE.ropeRetractStart, GUIDE.ropeRetractEnd);
 
         let angle = 0;
 
         if (time < GUIDE.ropeClimbBlendStart) {
-            /*
-            Normal falling + settling swing.
-            */
             angle = ropeSwingAngle(time);
         } else if (time < GUIDE.ropeClimbBlendEnd) {
-            /*
-            Smoothly transition from ropeSwingAngle to ropeClimbingSway.
-            */
-            const blendT = easeInOut(
-                progress(
-                    time,
-                    GUIDE.ropeClimbBlendStart,
-                    GUIDE.ropeClimbBlendEnd
-                )
-            );
-
+            const blendT = easeInOut(progress(time, GUIDE.ropeClimbBlendStart, GUIDE.ropeClimbBlendEnd));
             const settlingAngle = ropeSwingAngle(time);
             const climbingAngle = ropeClimbingSway(time);
-
             angle = lerp(settlingAngle, climbingAngle, blendT);
         } else if (time < GUIDE.ropeRetractStart) {
-            /*
-            Climbing phase.
-            */
             angle = ropeClimbingSway(time);
         } else {
-            /*
-            Retraction phase.
-            */
-            const retractT = progress(
-                time,
-                GUIDE.ropeRetractStart,
-                GUIDE.ropeRetractEnd
-            );
-
             angle = ropeClimbingSway(time) * (1 - retractT);
         }
 
-        /*
-        Endpoint from pendulum geometry.
-        */
         const endX = anchorX + length * Math.sin(angle);
         const endY = anchorY + length * Math.cos(angle);
 
-        /*
-        Direction from anchor to endpoint.
-        */
         const dx = endX - anchorX;
         const dy = endY - anchorY;
         const distance = Math.sqrt(dx * dx + dy * dy) || 1;
-
         const ux = dx / distance;
         const uy = dy / distance;
-
-        /*
-        Perpendicular direction.
-        */
         const px = -uy;
         const py = ux;
 
-        /*
-        Continuous rope bow.
-        */
         let bowStrength = 0;
 
         if (time < GUIDE.ropeClimbBlendStart) {
-            const u = progress(
-                time,
-                GUIDE.ropeFallStart,
-                GUIDE.ropeClimbBlendStart
-            );
-
-            bowStrength =
-                relativeLength(0.026, STICKMAN_SCALE) *
-                Math.sin(Math.PI * u) *
-                Math.exp(-1.2 * u);
+            const u = progress(time, GUIDE.ropeFallStart, GUIDE.ropeClimbBlendStart);
+            bowStrength = relativeLength(0.026, STICKMAN_SCALE) * Math.sin(Math.PI * u) * Math.exp(-1.2 * u);
         } else if (time < GUIDE.ropeClimbBlendEnd) {
-            const blendT = easeInOut(
-                progress(
-                    time,
-                    GUIDE.ropeClimbBlendStart,
-                    GUIDE.ropeClimbBlendEnd
-                )
-            );
-
-            const settlingU = progress(
-                time,
-                GUIDE.ropeFallStart,
-                GUIDE.ropeClimbBlendEnd
-            );
-
-            const settlingBow =
-                relativeLength(0.026, STICKMAN_SCALE) *
-                Math.sin(Math.PI * settlingU) *
-                Math.exp(-1.2 * settlingU);
-
-            const climbingBow =
-                relativeLength(0.004, STICKMAN_SCALE) *
-                Math.sin(time / 180);
-
+            const blendT = easeInOut(progress(time, GUIDE.ropeClimbBlendStart, GUIDE.ropeClimbBlendEnd));
+            const settlingU = progress(time, GUIDE.ropeFallStart, GUIDE.ropeClimbBlendEnd);
+            const settlingBow = relativeLength(0.026, STICKMAN_SCALE) * Math.sin(Math.PI * settlingU) * Math.exp(-1.2 * settlingU);
+            const climbingBow = relativeLength(0.004, STICKMAN_SCALE) * Math.sin(time / 180);
             bowStrength = lerp(settlingBow, climbingBow, blendT);
         } else {
-            bowStrength =
-                relativeLength(0.004, STICKMAN_SCALE) *
-                Math.sin(time / 180);
+            bowStrength = relativeLength(0.004, STICKMAN_SCALE) * Math.sin(time / 180);
         }
 
         const bowSign = angle >= 0 ? 1 : -1;
         const bow = bowStrength * bowSign;
 
-        const c1 = {
-            x: anchorX + dx * 0.33 + px * bow,
-            y: anchorY + dy * 0.33 + py * bow
-        };
-
-        const c2 = {
-            x: anchorX + dx * 0.70 - px * bow * 0.55,
-            y: anchorY + dy * 0.70 - py * bow * 0.55
-        };
+        const c1 = { x: anchorX + dx * 0.33 + px * bow, y: anchorY + dy * 0.33 + py * bow };
+        const c2 = { x: anchorX + dx * 0.70 - px * bow * 0.55, y: anchorY + dy * 0.70 - py * bow * 0.55 };
 
         const d = `
             M ${anchorX} ${anchorY}
             C ${c1.x} ${c1.y},
-            ${c2.x} ${c2.y},
-            ${endX} ${endY}
+              ${c2.x} ${c2.y},
+              ${endX} ${endY}
         `;
 
         ropeLine.setAttribute("d", d);
-
         ropeRing.setAttribute("cx", endX);
         ropeRing.setAttribute("cy", endY);
     }
 
     function getPlatformMotion(time) {
         const baseY = ny(GUIDE.floorY);
-
         const floorEnd = GUIDE.floorEnd;
-
-        /*
-        Gentle hover after the platform appears.
-        This value will be shared by both:
-        - the board
-        - the stickman after landing
-        */
-        const hover =
-            time >= floorEnd
-                ? Math.sin(time / 420) * 1.6
-                : 0;
-
-        /*
-        Landing dip.
-        The platform dips when the stickman lands.
-        */
+        const hover = time >= floorEnd ? Math.sin(time / 420) * 1.6 : 0;
         const landingMoment = getLandingMoment();
-
-        const landingT = progress(
-            time,
-            landingMoment,
-            landingMoment + 450
-        );
-
-        const landingDip =
-            Math.sin(Math.PI * landingT) * 5;
+        const landingT = progress(time, landingMoment, landingMoment + 450);
+        const landingDip = Math.sin(Math.PI * landingT) * 5;
 
         return {
             baseY,
@@ -1437,54 +872,37 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
+    function conePath(cx, topY, halfWidth, length) {
+        const tipY = topY + length;
+
+        return `
+            M ${cx - halfWidth} ${topY}
+            C ${cx - halfWidth * 0.75} ${topY + length * 0.30},
+            ${cx - halfWidth * 0.25} ${topY + length * 0.75},
+            ${cx} ${tipY}
+
+            C ${cx + halfWidth * 0.25} ${topY + length * 0.75},
+            ${cx + halfWidth * 0.75} ${topY + length * 0.30},
+            ${cx + halfWidth} ${topY}
+
+            Q ${cx} ${topY + 2},
+            ${cx - halfWidth} ${topY}
+            Z
+        `;
+    }
+
     function drawHoverPlatform(time) {
         const floorStart = GUIDE.floorStart;
         const floorEnd = GUIDE.floorEnd;
-
         const platformCenterX = nx(0.5);
         const fullHalfWidth = nx(0.21);
-
-        const appearT = easeOutCubic(
-            progress(time, floorStart, floorEnd)
-        );
-
+        const appearT = easeOutCubic(progress(time, floorStart, floorEnd));
         const platformMotion = getPlatformMotion(time);
         const y = platformMotion.y;
 
-        /*
-        Expand from the center outward.
-        */
         const halfWidth = fullHalfWidth * appearT;
-
         const boardLeftX = platformCenterX - halfWidth;
         const boardRightX = platformCenterX + halfWidth;
-
-        const landingMoment = getLandingMoment();
-
-        const preLandingT = easeInOut(
-            progress(
-                time,
-                landingMoment - 700,
-                landingMoment
-            )
-        );
-
-        const thrustFadeT = easeInOut(
-            progress(
-                time,
-                landingMoment + 6000,
-                landingMoment + 12000
-            )
-        );
-
-        const sustainedThrust =
-            preLandingT * (1 - thrustFadeT);
-
-        const propulsorPulse =
-            1 + sustainedThrust * 0.01 * Math.sin(time / 90);
-
-        leftPropulsor.setAttribute("rx", 6.5 * propulsorPulse);
-        rightPropulsor.setAttribute("rx", 6.5 * propulsorPulse);
 
         floor.style.opacity = appearT;
 
@@ -1498,128 +916,128 @@ document.addEventListener("DOMContentLoaded", () => {
         floorGlow.setAttribute("y1", y);
         floorGlow.setAttribute("y2", y);
 
-        /*
-        Glow pulses once as the floor appears,
-        then settles into a soft glow.
-        */
-        const glowPulse =
-            Math.sin(Math.PI * appearT) * 0.45;
-
+        const glowPulse = Math.sin(Math.PI * appearT) * 0.45;
         floorGlow.style.opacity = 0.16 + glowPulse;
 
-        /*
-        Propulsors sit below the board.
-        They appear slightly after the board begins expanding.
-        */
-        const propulsorAppearT = easeOutCubic(
-            progress(time, floorStart + 120, floorEnd + 150)
-        );
+        const landingMoment = getLandingMoment();
+        const preLandingT = easeInOut(progress(time, landingMoment - 700, landingMoment));
+        const thrustFadeT = easeInOut(progress(time, landingMoment + 6000, landingMoment + 12000));
+        const idleThrust = 0.48;
+        const sustainedThrust = preLandingT * lerp(1, idleThrust, thrustFadeT);
 
+        const propulsorAppearT = easeOutCubic(progress(time, floorStart + 120, floorEnd + 150));
         const propulsorOffsetX = fullHalfWidth * 0.48;
-        const propulsorY = y + 6;
-
         const leftPropulsorX = platformCenterX - propulsorOffsetX;
         const rightPropulsorX = platformCenterX + propulsorOffsetX;
+        const propulsorTopY = y + 4;
 
-        leftPropulsor.setAttribute("cx", leftPropulsorX);
-        leftPropulsor.setAttribute("cy", propulsorY);
-        leftPropulsor.setAttribute("ry", 3);
+        const flicker = 1 + Math.sin(time / 85) * 0.06 + Math.sin(time / 47) * 0.035;
 
-        rightPropulsor.setAttribute("cx", rightPropulsorX);
-        rightPropulsor.setAttribute("cy", propulsorY);
-        rightPropulsor.setAttribute("ry", 3);
+        const coneHalfWidth = 5.2;
+        const coneLength = (12 + sustainedThrust * 5.0) * flicker;
 
-        leftPropulsor.style.opacity = propulsorAppearT;
-        rightPropulsor.style.opacity = propulsorAppearT;
+        const coreHalfWidth = 1.8;
+        const coreLength = (9 + sustainedThrust * 3.8) * flicker;
 
-        /*
-        Particles now come out of the two propulsors,
-        not from the center of the board.
-        */
+        leftPropulsor.setAttribute(
+            "d",
+            conePath(leftPropulsorX, propulsorTopY, coneHalfWidth, coneLength)
+        );
+
+        rightPropulsor.setAttribute(
+            "d",
+            conePath(rightPropulsorX, propulsorTopY, coneHalfWidth, coneLength)
+        );
+
+        leftPropulsorCore.setAttribute(
+            "d",
+            conePath(leftPropulsorX, propulsorTopY + 1.2, coreHalfWidth, coreLength)
+        );
+
+        rightPropulsorCore.setAttribute(
+            "d",
+            conePath(rightPropulsorX, propulsorTopY + 1.2, coreHalfWidth, coreLength)
+        );
+        const flameOpacity =
+            propulsorAppearT *
+            lerp(0.42, 0.72, sustainedThrust);
+
+        const coreOpacity =
+            propulsorAppearT *
+            lerp(0.55, 0.98, sustainedThrust);
+
+        leftPropulsor.style.opacity = flameOpacity;
+        rightPropulsor.style.opacity = flameOpacity;
+        leftPropulsorCore.style.opacity = coreOpacity;
+        rightPropulsorCore.style.opacity = coreOpacity;
+
         drawPlatformParticles({
             time,
-            leftEmitter: {
-                x: leftPropulsorX,
-                y: propulsorY
-            },
-            rightEmitter: {
-                x: rightPropulsorX,
-                y: propulsorY
-            },
+            leftEmitter: { x: leftPropulsorX, y: propulsorTopY + coneLength },
+            rightEmitter: { x: rightPropulsorX, y: propulsorTopY + coneLength },
             platformVisible: appearT
         });
     }
 
- 
+    function drawPlatformParticles({ time, leftEmitter, rightEmitter, platformVisible }) {
+        const landingMoment = getLandingMoment();
+        const preLandingT = easeInOut(progress(time, landingMoment - 700, landingMoment));
+        const thrustFadeT = easeInOut(progress(time, landingMoment + 6000, landingMoment + 12000));
+        const idleThrust = 0.48;
+        const sustainedThrust = preLandingT * lerp(1, idleThrust, thrustFadeT);
+        const engineStrength = Math.min(1, platformVisible * 3);
+        const idleBase = 0.68;
+        const idleIntensity = engineStrength * lerp(0.16, idleBase, preLandingT);
+        const extraParticleIntensity = engineStrength * sustainedThrust * 0.75;
 
-    function drawFloor(scale) {
-        const floorY = ny(GUIDE.floorY);
+        floorParticles.forEach((particle, index) => {
+            const isExtraParticle = index >= 4;
+            const emitter = index % 2 === 0 ? leftEmitter : rightEmitter;
+            const side = index % 2 === 0 ? -1 : 1;
+            const speed = isExtraParticle ? 420 : 650;
+            const phase = (time / speed + index * 0.19) % 1;
+            const wiggle = Math.sin(time / 180 + index * 1.7) * 2.2;
+            const drift = side * phase * 2.5;
+            const particleX = emitter.x + wiggle + drift;
+            const travelDistance = isExtraParticle ? 30 : 22;
+            const particleY = emitter.y + 4 + phase * travelDistance;
+            const fade = Math.sin(Math.PI * phase);
 
-        floorLine.setAttribute("x1", nx(0.30));
-        floorLine.setAttribute("y1", floorY);
-        floorLine.setAttribute("x2", nx(0.70));
-        floorLine.setAttribute("y2", floorY);
+            const opacity = isExtraParticle
+                ? fade * extraParticleIntensity
+                : fade * idleIntensity;
 
-        floorLine.style.opacity = String(scale);
-        floorLine.style.transformBox = "fill-box";
-        floorLine.style.transformOrigin = "center";
-        floorLine.style.transform = `scaleX(${scale})`;
+            particle.setAttribute("cx", particleX);
+            particle.setAttribute("cy", particleY);
+            particle.setAttribute("r", "1.7");
+            particle.style.opacity = opacity;
+        });
     }
 
-    /* ========================= */
-    /* Animation loop            */
-    /* ========================= */
-
     const CLIMB_CYCLES = 3;
-
     let animationStartTime = null;
 
     function animateGuide(timestamp) {
         const t = timestamp - animationStartTime;
-        if (siteGuide.classList.contains("hidden")) {
-            return;
-        }
 
-        /*
-            1. Rope falls from the navbar.
-        */
+        if (siteGuide.classList.contains("hidden")) return;
 
         const fullRopeLength = ny(GUIDE.ropeLength);
-
         let currentRopeLength = 0;
 
         if (t < GUIDE.ropeFallEnd) {
-            const rawFallT = progress(
-                t,
-                GUIDE.ropeFallStart,
-                GUIDE.ropeFallEnd
-            );
-
-            /*
-            Gravity-like fall:
-            starts slowly, then accelerates.
-            */
+            const rawFallT = progress(t, GUIDE.ropeFallStart, GUIDE.ropeFallEnd);
             const fallT = easeInQuad(rawFallT);
-
             currentRopeLength = fullRopeLength * fallT;
         } else if (t < GUIDE.ropeRetractStart) {
             currentRopeLength = fullRopeLength;
         } else {
-            const retractT = easeInOut(
-                progress(t, GUIDE.ropeRetractStart, GUIDE.ropeRetractEnd)
-            );
-
+            const retractT = easeInOut(progress(t, GUIDE.ropeRetractStart, GUIDE.ropeRetractEnd));
             currentRopeLength = fullRopeLength * (1 - retractT);
         }
 
         drawRope(currentRopeLength, t);
-
-        ropeRing.style.opacity =
-            currentRopeLength > 10 && t < GUIDE.ropeRetractEnd ? "1" : "0";
-
-        /*
-            2. Stickman climbs down the rope.
-        */
+        ropeRing.style.opacity = currentRopeLength > 10 && t < GUIDE.ropeRetractEnd ? "1" : "0";
 
         let currentPose = climbingPoseA;
         let yOffset = -ny(0.56);
@@ -1632,58 +1050,28 @@ document.addEventListener("DOMContentLoaded", () => {
         if (t >= GUIDE.climbStart && t < GUIDE.climbEnd) {
             stickman.style.opacity = "1";
 
-            const climbT = easeInOut(
-            progress(t, GUIDE.climbStart, GUIDE.climbEnd)
-            );
-
+            const climbT = easeInOut(progress(t, GUIDE.climbStart, GUIDE.climbEnd));
             yOffset = lerp(-ny(0.56), 0, climbT);
 
-            /*
-            This cycles between the two climbing poses.
-
-            The hands remain on the rope because both generated poses
-            place the hands at x = GUIDE.ropeX.
-            */
-
             const cycle = (Math.sin(climbT * Math.PI * 2 * CLIMB_CYCLES) + 1) / 2;
-
-            const highClimbingPose = interpolatePose(
-                highClimbingPoseA,
-                highClimbingPoseB,
-                cycle
-            );
-
-            const normalClimbingPose = interpolatePose(
-                climbingPoseA,
-                climbingPoseB,
-                cycle
-            );
-
+            const highClimbingPose = interpolatePose(highClimbingPoseA, highClimbingPoseB, cycle);
+            const normalClimbingPose = interpolatePose(climbingPoseA, climbingPoseB, cycle);
             const descendT = easeInOut(climbT);
 
-            currentPose = interpolatePose(
-                highClimbingPose,
-                normalClimbingPose,
-                descendT
-            );
+            currentPose = interpolatePose(highClimbingPose, normalClimbingPose, descendT);
         }
-
-        /*
-            3. Convert into standing pose.
-        */
 
         if (t >= GUIDE.standStart) {
             stickman.style.opacity = "1";
 
-            const standT = easeInOut(
-                progress(t, GUIDE.standStart, GUIDE.standEnd)
-            );
-
+            const standT = easeInOut(progress(t, GUIDE.standStart, GUIDE.standEnd));
             const landingPose = interpolatePose(climbingPoseA, climbingPoseB, 0.5);
-
             currentPose = interpolatePose(landingPose, welcomingPose, standT);
+
+            const landingMoment = getLandingMoment();
+            const rideBoardT = easeInOut(progress(t, landingMoment, landingMoment + 350));
             const platformMotion = getPlatformMotion(t);
-            yOffset = platformMotion.hover + platformMotion.landingDip;
+            yOffset = (platformMotion.hover + platformMotion.landingDip) * rideBoardT;
 
             if (standT < 0.5) {
                 squash = lerp(1, 0.94, standT / 0.5);
@@ -1693,29 +1081,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         drawStickman(currentPose, yOffset, squash);
-
-        /*
-            4. Floor appears just before landing.
-        */
-
         drawHoverPlatform(t);
 
-        /*
-            5. Optional speech bubble.
-        */
-
         if (guideBubble && t > GUIDE.bubbleStart) {
             guideBubble.classList.add("visible");
         }
 
-        if (guideBubble && t > GUIDE.bubbleStart) {
-            guideBubble.classList.add("visible");
-        }
-
-        /*
-            Keep the animation loop alive so the hover platform
-            and particles continue after the intro has finished.
-        */
         requestAnimationFrame(animateGuide);
     }
 
@@ -1724,15 +1095,9 @@ document.addEventListener("DOMContentLoaded", () => {
         requestAnimationFrame(animateGuide);
     }
 
-    if (siteGuide) {
-        requestAnimationFrame(startGuideAnimation);
-    }
+    requestAnimationFrame(startGuideAnimation);
 
-    /* ========================= */
-    /* Close button              */
-    /* ========================= */
-
-    if (siteGuide && guideCloseButton) {
+    if (guideCloseButton) {
         guideCloseButton.addEventListener("click", function () {
             siteGuide.classList.add("hidden");
         });
