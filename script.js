@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("year").textContent = new Date().getFullYear();
+    
     // Toggle button functionality for expandable containers
     document.querySelectorAll(".toggle-button").forEach(button => {
         button.addEventListener("click", function () {
