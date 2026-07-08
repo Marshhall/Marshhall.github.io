@@ -23,6 +23,166 @@
     <a href="pages/contact.html">Contact</a>
   </div>
 
+  <!-- STICKMAN GUIDE -->
+  <div class="site-guide" id="site-guide" aria-label="Website guide">
+    <svg
+      class="guide-svg"
+      viewBox="0 0 180 260"
+      aria-hidden="true"
+    >
+
+      <defs>
+        <!-- Outer cone: orange at the edges, transparent toward the edge -->
+        <linearGradient id="guide-thrust-outer-gradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ff9f1c" stop-opacity="0.85" />
+          <stop offset="65%" stop-color="#ff6b5f" stop-opacity="0.45" />
+          <stop offset="100%" stop-color="#ff6b5f" stop-opacity="0" />
+        </linearGradient>
+
+        <!-- Inner core: hotter red down the center -->
+        <linearGradient id="guide-thrust-core-gradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#fef9c3" stop-opacity="0.9" />
+          <stop offset="35%" stop-color="#ff6b5f" stop-opacity="0.95" />
+          <stop offset="100%" stop-color="#d94f45" stop-opacity="0.15" />
+        </linearGradient>
+
+        <!-- Soft glow around propulsion -->
+        <filter id="guide-thrust-glow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="2.4" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- Rope -->
+      <path
+        id="guide-rope-line"
+        class="guide-rope-line"
+        d="M 90 0"
+      />
+
+      <!-- Small rope ring -->
+      <circle
+        id="guide-rope-ring"
+        class="guide-rope-ring"
+        cx="90"
+        cy="0"
+        r="7"
+      />
+
+      <!-- Stickman -->
+      <g id="guide-stickman" class="guide-stickman">
+        <!-- Head -->
+        <circle
+          id="guide-head"
+          class="guide-head"
+          cx="90"
+          cy="90"
+          r="16"
+        />
+
+        <!-- Body -->
+        <line id="guide-neck-body" class="guide-line" />
+        <line id="guide-body-hip" class="guide-line" />
+
+        <!-- Left arm -->
+        <line id="guide-left-upper-arm" class="guide-line" />
+        <line id="guide-left-lower-arm" class="guide-line" />
+
+        <!-- Right arm -->
+        <line id="guide-right-upper-arm" class="guide-line" />
+        <line id="guide-right-lower-arm" class="guide-line" />
+
+        <!-- Left leg -->
+        <line id="guide-left-upper-leg" class="guide-line" />
+        <line id="guide-left-lower-leg" class="guide-line" />
+
+        <!-- Right leg -->
+        <line id="guide-right-upper-leg" class="guide-line" />
+        <line id="guide-right-lower-leg" class="guide-line" />
+
+        <!-- Hands and feet -->
+        <circle id="guide-left-hand" class="guide-joint" r="2.7" />
+        <circle id="guide-right-hand" class="guide-joint" r="2.7" />
+        <circle id="guide-left-foot" class="guide-joint" r="2.7" />
+        <circle id="guide-right-foot" class="guide-joint" r="2.7" />
+      </g>
+
+      <!-- Hover platform -->
+      <g id="guide-floor" class="guide-floor">
+        <!-- Soft glow behind the board -->
+        <line
+          id="guide-floor-glow"
+          class="guide-floor-glow"
+          x1="90"
+          y1="229"
+          x2="90"
+          y2="229"
+        />
+
+        <!-- Main board body -->
+        <line
+          id="guide-floor-line"
+          class="guide-floor-line"
+          x1="90"
+          y1="229"
+          x2="90"
+          y2="229"
+        />
+
+        <!-- Cone propulsors -->
+        <g id="guide-board-propulsors" class="guide-board-propulsors">
+          <path
+            id="guide-left-propulsor"
+            class="guide-board-propulsor"
+            d=""
+          />
+
+          <path
+            id="guide-right-propulsor"
+            class="guide-board-propulsor"
+            d=""
+          />
+
+          <path
+            id="guide-left-propulsor-core"
+            class="guide-board-propulsor-core"
+            d=""
+          />
+
+          <path
+            id="guide-right-propulsor-core"
+            class="guide-board-propulsor-core"
+            d=""
+          />
+        </g>
+
+        <!-- Propulsion particles -->
+        <g id="guide-floor-particles" class="guide-floor-particles">
+          <circle id="guide-floor-particle-1" class="guide-floor-particle" r="1.7" />
+          <circle id="guide-floor-particle-2" class="guide-floor-particle" r="1.7" />
+          <circle id="guide-floor-particle-3" class="guide-floor-particle" r="1.7" />
+          <circle id="guide-floor-particle-4" class="guide-floor-particle" r="1.7" />
+
+          <circle id="guide-floor-particle-5" class="guide-floor-particle guide-burst-particle" r="1.7" />
+          <circle id="guide-floor-particle-6" class="guide-floor-particle guide-burst-particle" r="1.7" />
+          <circle id="guide-floor-particle-7" class="guide-floor-particle guide-burst-particle" r="1.7" />
+          <circle id="guide-floor-particle-8" class="guide-floor-particle guide-burst-particle" r="1.7" />
+        </g>
+      </g>
+    </svg>
+
+    <!-- Optional bubble. Leave commented for now. -->
+    <!--
+    <div class="guide-bubble">
+      <button class="guide-close" type="button" aria-label="Hide guide">×</button>
+      <p>Hi! I just dropped in.</p>
+    </div>
+    -->
+  </div>
+
   <div class="middle-container home-container">
     <div class="profile home-profile">
       <h1 class="profile-name">Marçal</h1>
