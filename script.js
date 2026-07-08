@@ -250,7 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const BODY = {
         headRadius: 0.062,
-        neckLength: 0.035,
+        neckLength: 0.01, /*0.035,*/
         torsoLength: 0.17,
         shoulderWidth: 0,
 
@@ -266,10 +266,13 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ========================= */
 
     const TIMING = {
-        ropeFall: 700,
-        climb: 3700,
+        ropeFall: 1850,
+        ropeSettle: 700,
+        ropeClimbBlend: 500,
+        climb: 3200,
         floorAppear: 350,
-        stand: 600,
+        stand: 900,
+        greet: 700,
         pauseBeforeRopeRetract: 100,
         ropeRetract: 850,
         bubbleDelay: 150
@@ -281,17 +284,27 @@ document.addEventListener("DOMContentLoaded", () => {
         timeline.ropeFallStart = 0;
         timeline.ropeFallEnd = timeline.ropeFallStart + timing.ropeFall;
 
-        timeline.climbStart = timeline.ropeFallEnd;
+        timeline.ropeSettleStart = timeline.ropeFallEnd;
+        timeline.ropeSettleEnd = timeline.ropeSettleStart + timing.ropeSettle;
+
+        timeline.ropeClimbBlendStart = timeline.ropeSettleEnd;
+        timeline.ropeClimbBlendEnd =
+            timeline.ropeClimbBlendStart + timing.ropeClimbBlend;
+
+        timeline.climbStart = timeline.ropeClimbBlendEnd;
         timeline.climbEnd = timeline.climbStart + timing.climb;
 
         timeline.floorStart = timeline.climbEnd - timing.floorAppear;
-        timeline.floorEnd = timeline.floorStart + timing.floorAppear;
+        timeline.floorEnd = timeline.climbEnd;
 
         timeline.standStart = timeline.climbEnd;
         timeline.standEnd = timeline.standStart + timing.stand;
 
+        timeline.greetStart = timeline.standEnd;
+        timeline.greetEnd = timeline.greetStart + timing.greet;
+
         timeline.ropeRetractStart =
-            timeline.standEnd + timing.pauseBeforeRopeRetract;
+            timeline.greetEnd + timing.pauseBeforeRopeRetract;
 
         timeline.ropeRetractEnd =
             timeline.ropeRetractStart + timing.ropeRetract;
@@ -384,6 +397,70 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         return result;
+    }
+
+    function easeInQuad(t) {
+        return t * t;
+    }
+
+    function easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
+    }
+
+    function dampedSwing({
+        time,
+        startTime,
+        duration,
+        initialAngle,
+        frequency = 2.5,
+        damping = 3.2
+    }) {
+        /*
+        Returns a pendulum-like angle.
+
+        time and startTime are in milliseconds.
+        duration is in milliseconds.
+        initialAngle is in radians.
+
+        The formula is:
+            angle = initialAngle * e^(-damping * t) * cos(frequency * t)
+
+        where t is normalized-ish time in seconds.
+        */
+
+        const elapsed = Math.max(0, time - startTime) / 1000;
+        const normalized = clamp((time - startTime) / duration, 0, 1);
+
+        const decay = Math.exp(-damping * normalized);
+        const oscillation = Math.cos(frequency * Math.PI * 2 * elapsed);
+
+        return initialAngle * decay * oscillation;
+    }
+
+    function ropeSwingAngle(time) {
+        const initialAngle = -0.42;
+
+        const swingStart = GUIDE.ropeFallStart;
+        const swingEnd = GUIDE.ropeClimbBlendEnd;
+
+        const elapsed = Math.max(0, time - swingStart) / 1000;
+        const u = progress(time, swingStart, swingEnd);
+
+        const damping = 3.4;
+        const decay = Math.exp(-damping * u);
+
+        const frequency = 1.65;
+        const oscillation = Math.cos(2 * Math.PI * frequency * elapsed);
+
+        const fallVisibility = easeOutCubic(
+            progress(time, GUIDE.ropeFallStart, GUIDE.ropeFallEnd)
+        );
+
+        return initialAngle * decay * oscillation * fallVisibility;
+    }
+
+    function ropeClimbingSway(time) {
+        return Math.sin(time / 260) * 0.010;
     }
 
     /* ========================= */
@@ -557,6 +634,19 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ========================= */
     /* Pose builders             */
     /* ========================= */
+
+    function offsetPose(pose, offsetX, offsetY) {
+        const shiftedPose = {};
+
+        Object.keys(pose).forEach((key) => {
+            shiftedPose[key] = {
+                x: pose[key].x + offsetX,
+                y: pose[key].y + offsetY
+            };
+        });
+
+        return shiftedPose;
+    }
 
     /*
     Standing pose:
@@ -929,6 +1019,20 @@ document.addEventListener("DOMContentLoaded", () => {
         rightLegBend: -1
     });
 
+    const climbStartYOffset = -ny(0.23);
+
+    const highClimbingPoseA = offsetPose(
+        climbingPoseA,
+        0,
+        climbStartYOffset
+    );
+
+    const highClimbingPoseB = offsetPose(
+        climbingPoseB,
+        0,
+        climbStartYOffset
+    );
+
     const standingPose = createStandingPose({
         hip: point(0.5, 0.66),
         scale: STICKMAN_SCALE,
@@ -994,16 +1098,150 @@ document.addEventListener("DOMContentLoaded", () => {
         head.setAttribute("r", getBodyMeasurements(STICKMAN_SCALE).headRadius);
     }
 
-    function drawRope(length) {
-        const ropeX = nx(GUIDE.ropeX);
+    function drawRope(length, time) {
+        const anchorX = nx(GUIDE.ropeX);
+        const anchorY = 0;
 
-        ropeLine.setAttribute("x1", ropeX);
-        ropeLine.setAttribute("y1", 0);
-        ropeLine.setAttribute("x2", ropeX);
-        ropeLine.setAttribute("y2", length);
+        const retractT = progress(
+            time,
+            GUIDE.ropeRetractStart,
+            GUIDE.ropeRetractEnd
+        );
 
-        ropeRing.setAttribute("cx", ropeX);
-        ropeRing.setAttribute("cy", length);
+        let angle = 0;
+
+        if (time < GUIDE.ropeClimbBlendStart) {
+            /*
+            Normal falling + settling swing.
+            */
+            angle = ropeSwingAngle(time);
+        } else if (time < GUIDE.ropeClimbBlendEnd) {
+            /*
+            Smoothly transition from ropeSwingAngle to ropeClimbingSway.
+            */
+            const blendT = easeInOut(
+                progress(
+                    time,
+                    GUIDE.ropeClimbBlendStart,
+                    GUIDE.ropeClimbBlendEnd
+                )
+            );
+
+            const settlingAngle = ropeSwingAngle(time);
+            const climbingAngle = ropeClimbingSway(time);
+
+            angle = lerp(settlingAngle, climbingAngle, blendT);
+        } else if (time < GUIDE.ropeRetractStart) {
+            /*
+            Climbing phase.
+            */
+            angle = ropeClimbingSway(time);
+        } else {
+            /*
+            Retraction phase.
+            */
+            const retractT = progress(
+                time,
+                GUIDE.ropeRetractStart,
+                GUIDE.ropeRetractEnd
+            );
+
+            angle = ropeClimbingSway(time) * (1 - retractT);
+        }
+
+        /*
+        Endpoint from pendulum geometry.
+        */
+        const endX = anchorX + length * Math.sin(angle);
+        const endY = anchorY + length * Math.cos(angle);
+
+        /*
+        Direction from anchor to endpoint.
+        */
+        const dx = endX - anchorX;
+        const dy = endY - anchorY;
+        const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+
+        const ux = dx / distance;
+        const uy = dy / distance;
+
+        /*
+        Perpendicular direction.
+        */
+        const px = -uy;
+        const py = ux;
+
+        /*
+        Continuous rope bow.
+        */
+        let bowStrength = 0;
+
+        if (time < GUIDE.ropeClimbBlendStart) {
+            const u = progress(
+                time,
+                GUIDE.ropeFallStart,
+                GUIDE.ropeClimbBlendStart
+            );
+
+            bowStrength =
+                relativeLength(0.026, STICKMAN_SCALE) *
+                Math.sin(Math.PI * u) *
+                Math.exp(-1.2 * u);
+        } else if (time < GUIDE.ropeClimbBlendEnd) {
+            const blendT = easeInOut(
+                progress(
+                    time,
+                    GUIDE.ropeClimbBlendStart,
+                    GUIDE.ropeClimbBlendEnd
+                )
+            );
+
+            const settlingU = progress(
+                time,
+                GUIDE.ropeFallStart,
+                GUIDE.ropeClimbBlendEnd
+            );
+
+            const settlingBow =
+                relativeLength(0.026, STICKMAN_SCALE) *
+                Math.sin(Math.PI * settlingU) *
+                Math.exp(-1.2 * settlingU);
+
+            const climbingBow =
+                relativeLength(0.004, STICKMAN_SCALE) *
+                Math.sin(time / 180);
+
+            bowStrength = lerp(settlingBow, climbingBow, blendT);
+        } else {
+            bowStrength =
+                relativeLength(0.004, STICKMAN_SCALE) *
+                Math.sin(time / 180);
+        }
+
+        const bowSign = angle >= 0 ? 1 : -1;
+        const bow = bowStrength * bowSign;
+
+        const c1 = {
+            x: anchorX + dx * 0.33 + px * bow,
+            y: anchorY + dy * 0.33 + py * bow
+        };
+
+        const c2 = {
+            x: anchorX + dx * 0.70 - px * bow * 0.55,
+            y: anchorY + dy * 0.70 - py * bow * 0.55
+        };
+
+        const d = `
+            M ${anchorX} ${anchorY}
+            C ${c1.x} ${c1.y},
+            ${c2.x} ${c2.y},
+            ${endX} ${endY}
+        `;
+
+        ropeLine.setAttribute("d", d);
+
+        ropeRing.setAttribute("cx", endX);
+        ropeRing.setAttribute("cy", endY);
     }
 
     function drawFloor(scale) {
@@ -1040,22 +1278,30 @@ document.addEventListener("DOMContentLoaded", () => {
         let currentRopeLength = 0;
 
         if (t < GUIDE.ropeFallEnd) {
-            const ropeT = easeOutBack(
-            progress(t, GUIDE.ropeFallStart, GUIDE.ropeFallEnd)
+            const rawFallT = progress(
+                t,
+                GUIDE.ropeFallStart,
+                GUIDE.ropeFallEnd
             );
 
-            currentRopeLength = fullRopeLength * ropeT;
+            /*
+            Gravity-like fall:
+            starts slowly, then accelerates.
+            */
+            const fallT = easeInQuad(rawFallT);
+
+            currentRopeLength = fullRopeLength * fallT;
         } else if (t < GUIDE.ropeRetractStart) {
             currentRopeLength = fullRopeLength;
         } else {
             const retractT = easeInOut(
-            progress(t, GUIDE.ropeRetractStart, GUIDE.ropeRetractEnd)
+                progress(t, GUIDE.ropeRetractStart, GUIDE.ropeRetractEnd)
             );
 
             currentRopeLength = fullRopeLength * (1 - retractT);
         }
 
-        drawRope(currentRopeLength);
+        drawRope(currentRopeLength, t);
 
         ropeRing.style.opacity =
             currentRopeLength > 10 && t < GUIDE.ropeRetractEnd ? "1" : "0";
@@ -1090,7 +1336,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const cycle = (Math.sin(climbT * Math.PI * 2 * CLIMB_CYCLES) + 1) / 2;
 
-            currentPose = interpolatePose(climbingPoseA, climbingPoseB, cycle);
+            const highClimbingPose = interpolatePose(
+                highClimbingPoseA,
+                highClimbingPoseB,
+                cycle
+            );
+
+            const normalClimbingPose = interpolatePose(
+                climbingPoseA,
+                climbingPoseB,
+                cycle
+            );
+
+            const descendT = easeInOut(climbT);
+
+            currentPose = interpolatePose(
+                highClimbingPose,
+                normalClimbingPose,
+                descendT
+            );
         }
 
         /*
