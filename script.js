@@ -477,14 +477,14 @@ document.addEventListener("DOMContentLoaded", () => {
             if (nucleusGlow) {
                 nucleusGlow.setAttribute("cx", midX);
                 nucleusGlow.setAttribute("cy", midY);
-                nucleusGlow.setAttribute("r", String(NUCLEUS.lobeRadius * 0.8 + tension * 9));
+                nucleusGlow.setAttribute("r", String(NUCLEUS.lobeRadius * 0.6 + tension * 9));
                 nucleusGlow.style.opacity = String((0.1 + 0.55 * tension) * flicker);
             }
 
             stressLines.forEach((line, index) => {
                 const angle = degreesToRadians(index * 60 + time / 40);
-                const inner = NUCLEUS.lobeRadius * 0.8;
-                const outer = inner + tension * 11.5;
+                const inner = NUCLEUS.lobeRadius * 0.6;
+                const outer = inner + tension * 10;
 
                 setLine(
                     line,
