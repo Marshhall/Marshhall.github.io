@@ -477,7 +477,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (nucleusGlow) {
                 nucleusGlow.setAttribute("cx", midX);
                 nucleusGlow.setAttribute("cy", midY);
-                nucleusGlow.setAttribute("r", String(NUCLEUS.lobeRadius * 0.4 + tension * 9));
+                nucleusGlow.setAttribute("r", String(NUCLEUS.lobeRadius * 0.8 + tension * 9));
                 nucleusGlow.style.opacity = String((0.1 + 0.55 * tension) * flicker);
             }
 
@@ -1470,11 +1470,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const flicker = 1 + Math.sin(time / 85) * 0.06 + Math.sin(time / 47) * 0.035;
 
-        const coneHalfWidth = 5.2;
-        const coneLength = (12 + sustainedThrust * 5.0) * flicker;
+        const coneHalfWidth = 8.4;
+        const coneLength = (21 + sustainedThrust * 8.5) * flicker;
 
-        const coreHalfWidth = 1.8;
-        const coreLength = (9 + sustainedThrust * 3.8) * flicker;
+        const coreHalfWidth = 3.3;
+        const coreLength = (16 + sustainedThrust * 6.5) * flicker;
 
         leftPropulsor.setAttribute(
             "d",
