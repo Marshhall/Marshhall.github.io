@@ -22,3 +22,7 @@ Fer que la paraula worldline es deformi com si fos una deformació de l'espai-te
 Stickman dibuixa l'eix temporal de la worldline
 
 Stickman, a prop de worldline, dispara un làser i llavors intenta perseguir-lo (pregunta Einstein)
+
+Crear animació stickman per les tesis
+
+Incloure rang de la promoció dins d'Education
