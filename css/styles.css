@@ -1842,16 +1842,16 @@ footer {
 
 .header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   padding: 20px;
   background-color: #ffffff; /* MIT blue */
   color: #ffffff;
 }
 
-.psl-container .header {
-  padding-top: 16px;
+/* .psl-container .header {
+  padding-top: 20px;
   padding-bottom: 16px;
-}
+} */
 
 .psl-container .psl-logo {
   max-height: 100px;
@@ -2080,6 +2080,56 @@ footer {
   float: right;
   font-family: "Montserrat", sans-serif;
   font-weight: 600;
+}
+
+.stats-row {
+  display: flex;
+  margin: 14px 0 0 30px;
+  padding: 0 20px 0 0;
+  gap: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease-in-out, visibility 0s 0.4s;
+}
+
+.stats-row.visible {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s ease-in-out, visibility 0s;
+}
+
+.stat {
+  flex: 1;
+  text-align: left;
+  border-left: 2px solid #eef4f4;
+  padding-left: 16px;
+}
+
+.stat:first-child {
+  border-left: none;
+  padding-left: 0;
+}
+
+.stat-label {
+  display: block;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8a978f;
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  display: block;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
+}
+
+.stat-value.accent {
+  color: #11999e;
 }
 
 .full-desc {

@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
         button.addEventListener("click", function () {
             const container = this.closest(".expandable-container");
             const description = container.querySelector(".description");
-            const additionalInfo = container.querySelector(".additional-info");
+            const additionalInfo = container.querySelector(".stats-row");
 
             if (description.classList.contains("expanded")) {
                 // Collapse
