@@ -25,4 +25,4 @@ Stickman, a prop de worldline, dispara un làser i llavors intenta perseguir-lo 
 
 Crear animació stickman per les tesis
 
-Incloure rang de la promoció dins d'Education
+Fer loading page abans de mostrar nous continguts (veure animacions a https://lottiefiles.com/free-animations/physics, https://reactdrops.dev/components/background/shape-physics, https://reactdrops.dev/components/background/shape-physics)
