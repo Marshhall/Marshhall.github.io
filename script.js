@@ -105,14 +105,68 @@ document.addEventListener("DOMContentLoaded", () => {
     const timeline = document.querySelector(".about-horizontal-timeline-single");
 
     if (timeline) {
+        // An omitted end date means "ongoing".
+        const experiences = {
+            ub:           { start: "2020-09-01", end: "2025-07-01" },
+            crm:          { start: "2023-06-01", end: "2023-10-01" },
+            irb:          { start: "2024-07-01", end: "2025-03-01" },
+            bsc:          { start: "2024-11-01", end: "2025-07-01" },
+            westinghouse: { start: "2025-07-01" },
+            psl:          { start: "2025-09-01" }
+        };
+
+        const today = new Date();
+        const currentYear = today.getUTCFullYear();
+
+        const axisStart = Date.UTC(2020, 0, 1);
+        const axisEnd = Date.UTC(currentYear + 1, 0, 1);
+        const axisDuration = axisEnd - axisStart;
+
+        // Keep dates within the displayed timeline.
+        const fraction = date =>
+            Math.max(0, Math.min(1, (date - axisStart) / axisDuration));
+
+        // Your axis has 35px of space on either side.
+        // Use that same space for the strips so they align with the years.
+        const position = value =>
+            `calc(35px + (100% - 70px) * ${value})`;
+
+        const stripWidth = value =>
+            `calc((100% - 70px) * ${value})`;
+
         const timelineItems = timeline.querySelectorAll(".timeline-item");
 
-        // Store final widths and reset them
         timelineItems.forEach(item => {
-            const targetWidth = item.getAttribute("data-width") || item.style.width;
-            item.setAttribute("data-width", targetWidth);
-            item.style.width = "0";
+            const key = Object.keys(experiences).find(name =>
+                item.classList.contains(name)
+            );
+
+            if (!key) return;
+
+            const experience = experiences[key];
+            const start = fraction(Date.parse(experience.start));
+            const end = fraction(
+                experience.end ? Date.parse(experience.end) : today.getTime()
+            );
+
+            item.style.left = position(start);
+            item.dataset.width = stripWidth(Math.max(0, end - start));
+            item.style.width = "0"; // Preserve your existing entrance animation.
         });
+
+        // Generate year labels using the same date scale.
+        const labels = timeline.querySelector(".timeline-axis-labels");
+        labels.replaceChildren();
+
+        for (let year = 2020; year <= currentYear; year++) {
+            const label = document.createElement("span");
+
+            label.textContent = year;
+            label.style.left =
+                `${fraction(Date.UTC(year, 0, 1)) * 100}%`;
+
+            labels.appendChild(label);
+        }
 
         const timelineObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
