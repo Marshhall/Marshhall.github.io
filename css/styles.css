@@ -1090,7 +1090,7 @@ ul {
   background-color: #66bfbf;
 }
 
-.timeline-item.westinghouse {
+.timeline-item.w {
   background-color: #5b8def;
 }
 
@@ -1102,6 +1102,81 @@ ul {
   background-color: #b084cc;
 }
 
+a.timeline-item {
+  --timeline-glow: 102, 191, 191;
+
+  display: block;
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  font-family: inherit;
+  text-decoration: none;
+  border-radius: 999px;
+  cursor: pointer;
+
+  transition:
+    width 1.8s ease,
+    transform 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+}
+
+/* Match each glow to the strip's existing color. */
+a.timeline-item.ub {
+  --timeline-glow: 142, 207, 159;
+}
+
+a.timeline-item.crm {
+  --timeline-glow: 242, 193, 78;
+}
+
+a.timeline-item.irb {
+  --timeline-glow: 242, 140, 140;
+}
+
+a.timeline-item.bsc {
+  --timeline-glow: 102, 191, 191;
+}
+
+a.timeline-item.w {
+  --timeline-glow: 91, 141, 239;
+}
+
+a.timeline-item.psl {
+  --timeline-glow: 176, 132, 204;
+}
+
+
+/* Bright inner glow surrounded by a softer halo. */
+a.timeline-item:hover,
+a.timeline-item:focus-visible {
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 8px rgba(var(--timeline-glow), 0.75),
+    0 0 20px rgba(var(--timeline-glow), 0.5),
+    0 0 36px rgba(var(--timeline-glow), 0.25),
+    0 0 0 5px rgba(var(--timeline-glow), 0.15);
+}
+
+a.timeline-item:focus-visible {
+  outline: 3px solid #11999e;
+  outline-offset: 5px;
+}
+
+/* Keep the destination below the fixed navigation bar. */
+.expandable-container[id] {
+  scroll-margin-top: 90px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a.timeline-item {
+    transition: none;
+  }
+
+  a.timeline-item:hover,
+  a.timeline-item:focus-visible {
+    transform: none;
+  }
+}
 
 
 

@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
             crm:          { start: "2023-06-01", end: "2023-10-01" },
             irb:          { start: "2024-07-01", end: "2025-03-01" },
             bsc:          { start: "2024-11-01", end: "2025-07-01" },
-            westinghouse: { start: "2025-07-01" },
+            w: { start: "2025-07-01" },
             psl:          { start: "2025-09-01" }
         };
 
