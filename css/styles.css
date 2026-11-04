@@ -2507,3 +2507,130 @@ footer {
   font-family: 'Montserrat', sans-serif;
 }
 
+
+
+
+.worldline-scroll {
+  overflow-x: auto;
+  padding: 16px 0;
+}
+
+#worldline {
+  display: block;
+  width: 100%;
+  min-width: 1100px;
+  height: auto;
+  overflow: visible;
+}
+
+#worldline .time-axis {
+  stroke: #40514e;
+  stroke-width: 2;
+  opacity: 0.35;
+}
+
+#worldline .year-guide {
+  stroke: #40514e;
+  stroke-width: 1;
+  opacity: 0.1;
+}
+
+#worldline text {
+  fill: #272727;
+  font-family: "Montserrat", sans-serif;
+  font-size: 14px;
+}
+
+#worldline .year-label {
+  fill: #40514e;
+  font-size: 13px;
+}
+
+#worldline .experience-path {
+  fill: none;
+  stroke: var(--event-color);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#worldline .planned .experience-path {
+  stroke-dasharray: 8 7;
+}
+
+#worldline .event-node {
+  fill: #fff;
+  stroke: var(--event-color);
+  stroke-width: 3;
+}
+
+#worldline .milestone-node {
+  fill: var(--event-color);
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+/* Wide invisible stroke makes narrow branches easier to click. */
+#worldline .hit-area {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 28;
+  pointer-events: stroke;
+}
+
+#worldline .event-link {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+#worldline .event-label {
+  font-weight: 600;
+}
+
+/* Glow without moving the branch away from its connection points. */
+#worldline .experience-path,
+#worldline .milestone-node {
+  transition: filter 0.3s ease-in-out;
+}
+
+#worldline .event-link:hover .experience-path,
+#worldline .event-link:hover .milestone-node,
+#worldline .event-link:focus-visible .experience-path,
+#worldline .event-link:focus-visible .milestone-node {
+  filter:
+    drop-shadow(0 0 4px var(--event-color))
+    drop-shadow(0 0 9px var(--event-color));
+}
+
+#worldline .event-link:focus-visible .event-label {
+  text-decoration: underline;
+}
+
+#worldline .influence-path {
+  fill: none;
+  stroke: #758481;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 6;
+}
+
+#worldline .influence-arrow {
+  fill: #758481;
+}
+
+.worldline-legend {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: #40514e;
+}
+
+.expandable-container[id],
+.award-box[id] {
+  scroll-margin-top: 90px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #worldline .experience-path,
+  #worldline .milestone-node {
+    transition: none;
+  }
+}

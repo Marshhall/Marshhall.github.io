@@ -1969,3 +1969,291 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const svg = document.getElementById("worldline");
+  if (!svg) return;
+
+  const NS = "http://www.w3.org/2000/svg";
+  const today = Date.now();
+
+  // Vertical positions are deliberate layout choices.
+  // Horizontal positions are calculated entirely from dates.
+  const axisY = 490;
+
+  const experiences = [
+    {
+      id: "ub",
+      label: "Bachelor’s · UB",
+      start: "2020-09-01",
+      end: "2025-07-01",
+      y: 270,
+      color: "#8ecf9f",
+      href: "cv.html#cv-ub"
+    },
+    {
+      id: "crm",
+      label: "CRM",
+      start: "2023-06-01",
+      end: "2023-09-01",
+      parent: "ub",
+      y: 205,
+      color: "#f2c14e",
+      href: "cv.html#cv-crm"
+    },
+    {
+      id: "irb",
+      label: "IRB",
+      start: "2024-07-01",
+      end: "2025-03-01",
+      parent: "ub",
+      y: 140,
+      color: "#f28c8c",
+      href: "cv.html#cv-irb"
+    },
+    {
+      id: "bsc",
+      label: "BSC",
+      start: "2024-11-01",
+      end: "2025-07-01",
+      parent: "ub",
+      y: 75,
+      color: "#66bfbf",
+      href: "cv.html#cv-bsc"
+    },
+    {
+      id: "westinghouse",
+      label: "Westinghouse",
+      start: "2025-07-01",
+      y: 550,
+      color: "#5b8def",
+      href: "cv.html#cv-westinghouse"
+    },
+    {
+      id: "psl",
+      label: "Master’s · PSL",
+      start: "2025-09-01",
+      // No end date: draw to today, without a return branch.
+      y: 400,
+      color: "#b084cc",
+      href: "cv.html#cv-psl"
+    },
+    {
+      id: "mit",
+      label: "MIT · planned",
+      start: "2027-04-01",
+      end: "2027-11-01",
+      parent: "psl",
+      planned: true,
+      y: 335,
+      color: "#c46d78",
+      href: "cv.html#cv-mit"
+    }
+  ];
+
+  const milestones = [
+    {
+      id: "fsmp",
+      label: "FSMP scholarship",
+      date: "2025-06-01", // Placeholder: adjust this.
+      y: axisY,
+      color: "#dcae38",
+      href: "cv.html#cv-fsmp"
+    }
+  ];
+
+  // These relationships are independent of branch nesting.
+  const influences = [
+    { from: "fsmp", to: "psl", label: "Enabled the PSL master’s" },
+    { from: "fsmp", to: "mit", label: "Partly funds the MIT stay" }
+  ];
+
+  const byId = new Map(experiences.map(event => [event.id, event]));
+  const milestoneById = new Map(
+    milestones.map(event => [event.id, event])
+  );
+
+  const axisStart = Date.UTC(2020, 0, 1);
+
+  // Include planned experiences, and expand automatically as time passes.
+  const latestDate = Math.max(
+    today,
+    ...experiences.map(event => Date.parse(event.end || event.start))
+  );
+
+  const axisEnd = Date.UTC(
+    new Date(latestDate).getUTCFullYear() + 1,
+    0,
+    1
+  );
+
+  const x = date => {
+    const timestamp = typeof date === "number" ? date : Date.parse(date);
+    return 55 + ((timestamp - axisStart) / (axisEnd - axisStart)) * 1090;
+  };
+
+  function add(tag, attributes, parent = svg, text) {
+    const element = document.createElementNS(NS, tag);
+
+    Object.entries(attributes).forEach(([name, value]) => {
+      element.setAttribute(name, value);
+    });
+
+    if (text !== undefined) element.textContent = text;
+    parent.appendChild(element);
+
+    return element;
+  }
+
+  // Arrowhead for enabling/funding connections.
+  const defs = add("defs", {});
+  const marker = add("marker", {
+    id: "worldline-arrow",
+    viewBox: "0 0 10 10",
+    refX: 9,
+    refY: 5,
+    markerWidth: 6,
+    markerHeight: 6,
+    orient: "auto"
+  }, defs);
+
+  add("path", {
+    d: "M 0 0 L 10 5 L 0 10 Z",
+    class: "influence-arrow"
+  }, marker);
+
+  // Layer order: guides, relationships, experiences, milestones.
+  const guides = add("g", {});
+  const relationships = add("g", {});
+  const branches = add("g", {});
+  const points = add("g", {});
+
+  const finalYear = new Date(axisEnd).getUTCFullYear();
+
+  for (let year = 2020; year <= finalYear; year++) {
+    const px = x(Date.UTC(year, 0, 1));
+
+    add("line", {
+      x1: px, x2: px,
+      y1: 40, y2: axisY,
+      class: "year-guide"
+    }, guides);
+
+    add("text", {
+      x: px,
+      y: axisY + 28,
+      "text-anchor": "middle",
+      class: "year-label"
+    }, guides, year);
+  }
+
+  add("line", {
+    x1: 55, x2: 1145,
+    y1: axisY, y2: axisY,
+    class: "time-axis"
+  }, guides);
+
+  influences.forEach(connection => {
+    const source = milestoneById.get(connection.from);
+    const target = byId.get(connection.to);
+
+    const sx = x(source.date);
+    const tx = x(target.start);
+
+    const path = add("path", {
+      d: `M ${sx} ${source.y}
+          C ${sx} ${source.y - 65},
+            ${tx} ${target.y + 65},
+            ${tx} ${target.y}`,
+      class: "influence-path",
+      "marker-end": "url(#worldline-arrow)"
+    }, relationships);
+
+    add("title", {}, path, connection.label);
+  });
+
+  experiences.forEach(event => {
+    const startX = x(event.start);
+    const endX = x(event.end || today);
+    const parentY = event.parent ? byId.get(event.parent).y : axisY;
+
+    // A branch leaves its parent at the start date.
+    let d = `M ${startX} ${parentY}
+             V ${event.y}
+             H ${endX}`;
+
+    // Completed or scheduled experiences return at their end date.
+    // Ongoing experiences remain open.
+    if (event.end) d += ` V ${parentY}`;
+
+    const link = add("a", {
+      href: event.href,
+      class: `event-link${event.planned ? " planned" : ""}`,
+      style: `--event-color: ${event.color}`,
+      "aria-label": `${event.label}: view CV entry`
+    }, branches);
+
+    add("title", {}, link,
+      `${event.label}: ${event.start} → ${event.end || "Present"}`
+    );
+
+    add("path", { d, class: "hit-area" }, link);
+    add("path", { d, class: "experience-path" }, link);
+
+    add("circle", {
+      cx: startX,
+      cy: parentY,
+      r: 5,
+      class: "event-node"
+    }, link);
+
+    add("circle", {
+      cx: endX,
+      cy: event.end ? parentY : event.y,
+      r: 5,
+      class: "event-node"
+    }, link);
+
+    add("text", {
+      x: startX + 10,
+      y: event.y - 14,
+      class: "event-label"
+    }, link, event.label);
+  });
+
+  milestones.forEach(event => {
+    const px = x(event.date);
+
+    const link = add("a", {
+      href: event.href,
+      class: "event-link",
+      style: `--event-color: ${event.color}`,
+      "aria-label": `${event.label}: view CV award`
+    }, points);
+
+    // Invisible larger target around the small diamond.
+    add("circle", {
+      cx: px,
+      cy: event.y,
+      r: 18,
+      fill: "transparent"
+    }, link);
+
+    add("path", {
+      d: `M ${px} ${event.y - 9}
+          L ${px + 9} ${event.y}
+          L ${px} ${event.y + 9}
+          L ${px - 9} ${event.y} Z`,
+      class: "milestone-node"
+    }, link);
+
+    add("text", {
+      x: px - 14,
+      y: event.y - 18,
+      "text-anchor": "end",
+      class: "event-label"
+    }, link, event.label);
+  });
+});
