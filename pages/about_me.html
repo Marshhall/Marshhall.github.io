@@ -3,8 +3,10 @@
 
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Marçal</title>
   <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/worldline.css" />
   <link rel="icon" href="../images/favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -234,29 +236,23 @@
       >Worldline</a>
     </h3>
 
-    <div class="worldline-scroll">
-      <svg
-        id="worldline"
-        viewBox="0 0 1200 580"
-        aria-labelledby="worldline-title worldline-description"
-      >
-        <title id="worldline-title">Education and experience timeline</title>
-        <desc id="worldline-description">
-          Experiences branch from a shared time axis or their parent experience.
-          Diamonds mark milestones. Dashed arrows show enabling or funding
-          relationships. Select an experience to read its CV entry.
-        </desc>
-      </svg>
-    </div>
-
-    <p class="worldline-legend">
-      Solid branches: experiences · Diamonds: milestones ·
-      Dashed arrows: enabling or funding relationships ·
-      Dashed branches: planned experiences
-    </p>
+    <section class="wl" data-worldline aria-label="Education and experience timeline">
+      <div class="wl-surface">
+        <div class="wl-scroll">
+          <svg viewBox="0 0 1180 426" aria-label="Branching timeline. Select an experience to open its CV entry."></svg>
+        </div>
+        <div class="wl-footer">
+          <div class="wl-readout" aria-live="polite">
+            Hover or focus an experience to read its story and connections.
+          </div>
+          <button class="wl-replay" type="button" aria-label="Replay timeline entrance animation">↻ Replay</button>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script src="../script.js"></script>
+  <script src="../worldline.js"></script>
 </body>
 
 <!-- bottom footer -->

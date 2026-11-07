@@ -1,0 +1,748 @@
+.wl {
+  --wl-ink: #1b3230;
+  --wl-muted: #667b77;
+  --wl-faint: #92a49f;
+  --wl-teal: #11999e;
+  --wl-gold: #a98535;
+  --wl-surface: #ffffff;
+  --wl-surface-2: #f6faf9;
+  --wl-border: #e2eae7;
+  --wl-grid: #eef3f1;
+  --wl-band: #f3f8f6;
+  --wl-axis: #a9bdb7;
+  --wl-halo: #ffffff;
+  --wl-shadow: 0 1px 2px #1b32300d, 0 34px 80px -40px #1b323066;
+
+  font-family: "Montserrat", system-ui, sans-serif;
+  color: var(--wl-ink);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Optional: <section class="wl" data-theme="dark"> */
+.wl[data-theme="dark"] {
+  --wl-ink: #e8f3f0;
+  --wl-muted: #93aaa5;
+  --wl-faint: #6c8580;
+  --wl-gold: #d6b264;
+  --wl-surface: #0e1819;
+  --wl-surface-2: #121f20;
+  --wl-border: #213436;
+  --wl-grid: #162526;
+  --wl-band: #142324;
+  --wl-axis: #4d6a65;
+  --wl-halo: #0e1819;
+  --wl-shadow: 0 1px 2px #0006, 0 34px 80px -34px #000b;
+}
+
+.wl *,
+.wl *::before,
+.wl *::after {
+  box-sizing: border-box;
+}
+
+/* Neutralise site-wide a / p / h3 rules inside the component. */
+.wl a,
+.wl a:hover {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  transition: none;
+}
+
+.wl p {
+  line-height: 1.6;
+}
+
+/* ───────── Surface ───────── */
+
+.wl .wl-surface {
+  border: 1px solid var(--wl-border);
+  border-radius: 30px;
+  box-shadow: var(--wl-shadow);
+  overflow: hidden;
+}
+
+.wl .wl-scroll {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--wl-axis) transparent;
+}
+
+.wl svg {
+  display: block;
+  width: 100%;
+  min-width: 1000px;
+  height: auto;
+  overflow: visible;
+}
+
+.wl svg text {
+  font-family: "Montserrat", system-ui, sans-serif;
+  fill: var(--wl-ink);
+}
+
+.wl .wl-layer {
+  pointer-events: none;
+}
+
+/* ───────── Background ───────── */
+
+.wl .wl-hatch {
+  stroke: var(--wl-teal);
+  stroke-opacity: 0.1;
+  stroke-width: 1;
+}
+
+.wl .wl-year-hair {
+  stroke: var(--wl-grid);
+  stroke-width: 1;
+}
+
+.wl .wl-today-line {
+  stroke: var(--wl-teal);
+  stroke-width: 1.3;
+  stroke-dasharray: 1 6;
+  stroke-linecap: round;
+  opacity: 0.65;
+}
+
+.wl .wl-today-pill {
+  fill: var(--wl-ink);
+}
+
+.wl .wl-today-text {
+  fill: var(--wl-surface);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.wl .wl-ahead {
+  fill: var(--wl-faint);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+}
+
+.wl .wl-guide {
+  stroke: var(--c, var(--wl-teal));
+  stroke-width: 1.2;
+  stroke-dasharray: 1 5;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.wl .wl-guide.on {
+  opacity: 0.55;
+}
+
+/* ───────── Year ruler ───────── */
+
+.wl .wl-band {
+  fill: var(--wl-band);
+  stroke: var(--wl-border);
+  stroke-width: 1;
+}
+
+.wl .wl-band-future {
+  opacity: 0.9;
+}
+
+.wl .wl-sep {
+  stroke: var(--wl-axis);
+  stroke-width: 1;
+  opacity: 0.6;
+  stroke-linecap: round;
+}
+
+.wl .wl-year {
+  fill: var(--wl-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.wl .wl-year.is-now {
+  fill: var(--wl-teal);
+  font-weight: 700;
+}
+
+.wl .wl-year.is-future {
+  opacity: 0.55;
+}
+
+.wl .wl-span {
+  fill: var(--c, var(--wl-teal));
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.wl .wl-span.on {
+  opacity: 0.2;
+}
+
+.wl .wl-scrub {
+  fill: var(--wl-teal);
+  filter: drop-shadow(0 0 5px #11999e99);
+}
+
+/* ───────── Branches ───────── */
+
+.wl .wl-part {
+  transition: opacity 0.4s ease;
+}
+
+.wl .wl-part.is-dim {
+  opacity: 0.13;
+}
+
+.wl .wl-lane,
+.wl .wl-tail,
+.wl .wl-proj {
+  fill: none;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wl .wl-lane {
+  filter: drop-shadow(0 3px 4px color-mix(in srgb, var(--c) 30%, transparent));
+  transition: stroke-width 0.3s ease, filter 0.3s ease;
+}
+
+.wl .wl-part.is-active .wl-lane {
+  stroke-width: 7.5;
+  filter: drop-shadow(0 4px 8px color-mix(in srgb, var(--c) 55%, transparent));
+}
+
+.wl .is-planned .wl-lane {
+  stroke-width: 5.5;
+  stroke-dasharray: 0.1 11;
+  filter: none;
+}
+
+.wl .is-planned.is-active .wl-lane {
+  stroke-width: 7;
+}
+
+.wl .wl-proj {
+  stroke: var(--c);
+  stroke-width: 5;
+  stroke-dasharray: 0.1 11;
+  opacity: 0.55;
+}
+
+.wl .wl-ring {
+  fill: var(--wl-surface);
+  stroke: var(--c);
+  stroke-width: 2.4;
+}
+
+.wl .wl-end {
+  fill: var(--wl-surface);
+  stroke: var(--c);
+  stroke-width: 3.2;
+}
+
+.wl .wl-live {
+  fill: var(--c);
+  stroke: var(--wl-surface);
+  stroke-width: 2.6;
+}
+
+.wl .wl-live-ring {
+  fill: none;
+  stroke: var(--c);
+  stroke-width: 1.5;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.wl.is-visible .wl-live-ring {
+  animation: wl-pulse 3s ease-out infinite;
+  animation-delay: 3s;
+}
+
+/* Labels sit on a halo, so a dotted line never cuts through them. */
+.wl .wl-label,
+.wl .wl-sub,
+.wl .wl-arc-label {
+  paint-order: stroke;
+  stroke: var(--wl-halo);
+  stroke-width: 6px;
+  stroke-linejoin: round;
+}
+
+.wl .wl-label {
+  fill: var(--wl-ink);
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.wl .wl-sub {
+  fill: var(--wl-muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.wl .wl-tag {
+  fill: var(--wl-gold);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+/* ───────── Milestone ───────── */
+
+.wl .wl-pin {
+  stroke: var(--wl-gold);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.wl .wl-halo {
+  fill: var(--c);
+  fill-opacity: 0.14;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.wl .wl-ping {
+  fill: none;
+  stroke: var(--c);
+  stroke-width: 1.5;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.wl.is-visible .wl-ping {
+  animation: wl-pulse 3.6s ease-out infinite;
+  animation-delay: 3.2s;
+}
+
+.wl .wl-diamond {
+  stroke: var(--wl-surface);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 3px 5px #b8892b55);
+  transition: filter 0.3s ease;
+}
+
+.wl .wl-diamond-core {
+  fill: #fff;
+  opacity: 0.85;
+}
+
+.wl .wl-part.is-active .wl-diamond {
+  filter: drop-shadow(0 0 8px var(--c));
+}
+
+/* ───────── Funding arcs ───────── */
+
+.wl .wl-arc-group {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.wl .wl-arc-group.on {
+  opacity: 1;
+}
+
+.wl .wl-arc,
+.wl .wl-arc-halo {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.wl .wl-arc-halo {
+  stroke: var(--wl-halo);
+  stroke-width: 7;
+}
+
+.wl .wl-arc {
+  stroke: var(--wl-gold);
+  stroke-width: 2;
+  stroke-dasharray: 0.1 6;
+}
+
+.wl .wl-arc-label {
+  fill: var(--wl-gold);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+/* ───────── Hit targets ───────── */
+
+.wl .wl-hit {
+  cursor: pointer;
+  outline: none;
+}
+
+.wl .wl-hit-rect {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 2;
+  pointer-events: all;
+}
+
+.wl .wl-hit:focus-visible .wl-hit-rect {
+  stroke: var(--wl-teal);
+}
+
+.wl .wl-hit-path {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 26;
+  stroke-linecap: round;
+  pointer-events: stroke;
+}
+
+/* ───────── Footer ───────── */
+
+.wl .wl-footer {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 88px;
+  padding: 14px 24px;
+  background: var(--wl-surface-2);
+  border-top: 1px solid var(--wl-border);
+}
+
+.wl .wl-readout {
+  flex: 1;
+  font-size: 12px;
+  color: var(--wl-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.wl .wl-readout strong {
+  color: var(--wl-ink);
+  font-weight: 600;
+}
+
+.wl .wl-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 12px;
+}
+
+.wl .wl-card strong {
+  font-size: 15px;
+  letter-spacing: -0.02em;
+}
+
+.wl .wl-dot {
+  align-self: center;
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 20%, transparent);
+  margin-right: 2px;
+}
+
+.wl .wl-meta {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--wl-faint);
+  text-transform: uppercase;
+}
+
+.wl .wl-text {
+  flex-basis: 100%;
+  padding-left: 21px;
+}
+
+.wl .wl-chips {
+  display: flex;
+  flex-basis: 100%;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-left: 21px;
+  margin-top: 8px;
+}
+
+.wl .wl-chip {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--wl-ink);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--c) 14%, var(--wl-surface));
+  border: 1px solid color-mix(in srgb, var(--c) 40%, transparent);
+}
+
+.wl .wl-replay {
+  flex: none;
+  color: var(--wl-muted);
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  padding: 8px 14px;
+  transition: color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+
+.wl .wl-replay:hover {
+  color: var(--wl-teal);
+  border-color: var(--wl-teal);
+}
+
+.wl .wl-replay:active {
+  transform: scale(0.97);
+}
+
+.wl .wl-replay:focus-visible {
+  outline: 2px solid var(--wl-teal);
+  outline-offset: 2px;
+}
+
+.wl .wl-hint {
+  display: none;
+  font-size: 10px;
+  color: var(--wl-faint);
+  margin: 12px 0 0;
+}
+
+/* ───────── Entrance ───────── */
+
+.wl .wl-mask-draw {
+  stroke-dasharray: var(--wl-path-length);
+  stroke-dashoffset: var(--wl-path-length);
+}
+
+.wl.is-visible .wl-mask-draw {
+  animation: wl-trace 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation-delay: var(--delay, 0s);
+}
+
+.wl .wl-pop,
+.wl .wl-fade,
+.wl .wl-rise {
+  opacity: 0;
+}
+
+.wl .wl-pop {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.wl.is-visible .wl-pop {
+  animation: wl-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: var(--delay, 0s);
+}
+
+.wl.is-visible .wl-fade {
+  animation: wl-fade 0.7s ease forwards;
+  animation-delay: var(--delay, 0s);
+}
+
+.wl.is-visible .wl-rise {
+  animation: wl-rise 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  animation-delay: var(--delay, 0s);
+}
+
+.wl .wl-lane {
+  /* the mask handles the reveal; keep the line itself always painted */
+  opacity: 1;
+}
+
+@keyframes wl-trace {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes wl-pop {
+  from { opacity: 0; transform: scale(0.3); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes wl-fade {
+  to { opacity: 1; }
+}
+
+@keyframes wl-rise {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes wl-pulse {
+  0%   { opacity: 0.55; transform: scale(0.8); }
+  80%, 100% { opacity: 0; transform: scale(2.5); }
+}
+
+.expandable-container[id],
+.award-box[id] {
+  scroll-margin-top: 90px;
+}
+
+/* ───────── Responsive ───────── */
+
+.wl .wl-list {
+  display: none;
+}
+
+@media (max-width: 1040px) {
+  .wl .wl-heading {
+    display: block;
+  }
+
+  .wl .wl-key {
+    justify-content: flex-start;
+    max-width: none;
+    margin-top: 22px;
+  }
+
+  .wl .wl-hint {
+    display: block;
+  }
+}
+
+/* Phones: the same tree, as a list. */
+@media (max-width: 760px) {
+  .wl {
+    margin: 0;
+    padding: 0;
+  }
+
+  .wl .wl-surface {
+    border-radius: 22px;
+  }
+
+  .wl .wl-scroll,
+  .wl .wl-footer,
+  .wl .wl-hint {
+    display: none;
+  }
+
+  .wl .wl-list {
+    display: block;
+    padding: 24px 20px 10px;
+  }
+
+  .wl .wl-list ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .wl .wl-list li {
+    position: relative;
+    margin: 0 0 18px calc(var(--depth, 0) * 22px);
+    padding: 2px 0 2px 18px;
+  }
+
+  .wl .wl-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 3px;
+    bottom: 3px;
+    width: 4px;
+    border-radius: 4px;
+    background: var(--event);
+  }
+
+  .wl .wl-list li.is-planned::before {
+    background: radial-gradient(circle, var(--event) 1.6px, transparent 2px) 50% 0 / 4px 8px repeat-y;
+  }
+
+  .wl .wl-list li.is-milestone::before {
+    background: linear-gradient(180deg, #f3dc9c, #b8892b);
+  }
+
+  .wl .wl-list a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .wl .wl-list strong {
+    display: block;
+    font-size: 15px;
+    letter-spacing: -0.02em;
+    color: var(--wl-ink);
+  }
+
+  .wl .wl-list-sub {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--event);
+    filter: brightness(0.85);
+  }
+
+  .wl .wl-list-text {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--wl-muted);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wl *,
+  .wl *::before,
+  .wl *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .wl .wl-mask-draw {
+    stroke-dashoffset: 0;
+  }
+
+  .wl .wl-pop,
+  .wl .wl-fade,
+  .wl .wl-rise {
+    opacity: 1;
+  }
+}
+
+/* Compact, title-only labels. The description lives below the chart. */
+.wl .wl-footer { min-height: 88px; }
+
+
+
+/* Reserve room for descriptions and relationship chips. */
+
+.wl .wl-footer {
+  box-sizing: border-box;
+  height: 130px;
+  min-height: 130px;
+  max-height: 130px;
+  align-items: center;
+}
+
+.wl .wl-readout {
+  min-width: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.wl .wl-replay {
+  flex-shrink: 0;
+}
