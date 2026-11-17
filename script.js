@@ -102,6 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
     applyTheme(currentTheme());
 
     let themeTransitionTimer = null;
+    let themePopTimer = null;
 
     if (themeToggleButton) {
         themeToggleButton.addEventListener("click", () => {
@@ -112,13 +113,19 @@ document.addEventListener("DOMContentLoaded", () => {
             clearTimeout(themeTransitionTimer);
             themeTransitionTimer = setTimeout(() => root.classList.remove("theme-transition"), 800);
 
-            // Brief pop + ripple on the button itself.
+            // Set the destination theme before starting its colored animation.
+            applyTheme(next);
+
+            // Cancel the previous cleanup so rapid clicks restart cleanly.
+            clearTimeout(themePopTimer);
+
             themeToggleButton.classList.remove("theme-toggle--pop");
             void themeToggleButton.offsetWidth; // restart the animation
             themeToggleButton.classList.add("theme-toggle--pop");
-            setTimeout(() => themeToggleButton.classList.remove("theme-toggle--pop"), 650);
 
-            applyTheme(next);
+            themePopTimer = setTimeout(() => {
+                themeToggleButton.classList.remove("theme-toggle--pop");
+            }, 650);
 
             try {
                 localStorage.setItem(THEME_KEY, next);

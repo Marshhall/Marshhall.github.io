@@ -340,7 +340,7 @@
   const BG_LIGHT   = [255, 255, 255, 1];
   const BG_DARK    = [27, 30, 35, 1];
   const COLS_LIGHT = [[17,153,158,0.20], [17,153,158,0.45], [17,153,158,0.72], [15,120,125,0.95]];
-  const COLS_DARK  = [[102,191,191,0.22], [102,191,191,0.48], [127,214,214,0.75], [176,240,238,0.95]];
+  const COLS_DARK = [[79, 195, 204, 0.22], [79, 195, 204, 0.48], [112, 214, 222, 0.75], [170, 237, 244, 0.95]];
   let themeMix = document.documentElement.getAttribute("data-theme") === "dark" ? 1 : 0;
 
   function draw(now) {
