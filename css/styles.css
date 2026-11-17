@@ -1409,7 +1409,7 @@ footer {
 .topnav a:hover {
   color: #30e3cb;
   transition: all ease 0.3s;
-  background-color: #333;
+  background-color: transparent;
 }
 
 .topnav a.active {
@@ -2507,3 +2507,424 @@ footer {
   font-family: 'Montserrat', sans-serif;
 }
 
+
+
+/* ========================================================= */
+/* THEME TOGGLE BUTTON                                       */
+/* ========================================================= */
+
+.theme-toggle {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(242, 242, 242, 0.25);
+  border-radius: 50%;
+  background: transparent;
+  color: #f2f2f2;
+  cursor: pointer;
+  overflow: visible;
+  transition: color 0.3s ease, border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.theme-toggle:hover {
+  color: #30e3cb;
+  border-color: #30e3cb;
+  background-color: rgba(48, 227, 203, 0.10);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid #30e3cb;
+  outline-offset: 3px;
+}
+
+.theme-toggle-icon {
+  width: 22px;
+  height: 22px;
+  overflow: visible;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Sun core grows into the moon body, a cut-out circle slides in to make the crescent */
+.theme-toggle-core {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(1);
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-toggle-cutout {
+  transform: translate(0, 0);
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-toggle-rays {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(0deg) scale(1);
+  opacity: 1;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+}
+
+html[data-theme="dark"] .theme-toggle-icon {
+  transform: rotate(-40deg);
+}
+
+html[data-theme="dark"] .theme-toggle-core {
+  transform: scale(1.55);
+}
+
+html[data-theme="dark"] .theme-toggle-cutout {
+  transform: translate(-13px, 7px);
+}
+
+html[data-theme="dark"] .theme-toggle-rays {
+  transform: rotate(90deg) scale(0.2);
+  opacity: 0;
+}
+
+/* Brief "pop" + ripple when clicked */
+/* Warm gold when switching to light mode */
+.theme-toggle.theme-toggle--pop {
+  --flash-color: #ffd166;
+  --flash-background: rgba(255, 209, 102, 0.18);
+  --flash-glow: rgba(255, 190, 65, 0.5);
+
+  color: var(--flash-color);
+  border-color: var(--flash-color);
+  background-color: var(--flash-background);
+  box-shadow: 0 0 18px 3px var(--flash-glow);
+
+  animation: theme-toggle-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Soft periwinkle when switching to dark mode */
+html[data-theme="dark"] .theme-toggle.theme-toggle--pop {
+  --flash-color: #c4c6ff;
+  --flash-background: rgba(196, 198, 255, 0.18);
+  --flash-glow: rgba(161, 168, 255, 0.5);
+}
+
+.theme-toggle.theme-toggle--pop::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid var(--flash-color);
+  opacity: 0;
+  animation: theme-toggle-ripple 0.6s ease-out;
+  pointer-events: none;
+}
+
+@keyframes theme-toggle-pop {
+  0%   { transform: translateY(-50%) scale(1); }
+  35%  { transform: translateY(-50%) scale(0.78); }
+  100% { transform: translateY(-50%) scale(1); }
+}
+
+@keyframes theme-toggle-ripple {
+  0%   { opacity: 0.8; transform: scale(1); }
+  100% { opacity: 0;   transform: scale(2); }
+}
+
+@media (max-width: 600px) {
+  .theme-toggle {
+    right: 8px;
+    width: 32px;
+    height: 32px;
+  }
+  .topnav a {
+    padding: 14px 10px;
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle,
+  .theme-toggle-icon,
+  .theme-toggle-core,
+  .theme-toggle-cutout,
+  .theme-toggle-rays {
+    transition: none;
+  }
+  .theme-toggle.theme-toggle--pop,
+  .theme-toggle.theme-toggle--pop::after {
+    animation: none;
+  }
+}
+
+
+/* ========================================================= */
+/* SMOOTH THEME TRANSITION                                   */
+/* The class is added to <html> by script.js for ~0.8s only  */
+/* ========================================================= */
+
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition:
+    background-color 0.6s ease,
+    color 0.6s ease,
+    border-color 0.6s ease,
+    box-shadow 0.6s ease,
+    fill 0.6s ease,
+    stroke 0.6s ease !important;
+}
+
+html.theme-transition .theme-toggle {
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease,
+    background-color 0.12s ease,
+    box-shadow 0.12s ease !important;
+}
+
+/* Preserve your existing reduced-motion behavior */
+@media (prefers-reduced-motion: reduce) {
+  html.theme-transition .theme-toggle,
+  html.theme-transition .theme-toggle-icon,
+  html.theme-transition .theme-toggle-core,
+  html.theme-transition .theme-toggle-cutout,
+  html.theme-transition .theme-toggle-rays {
+    transition: none !important;
+  }
+}
+
+/* Keep the toggle's own icon animation intact during the switch */
+html.theme-transition .theme-toggle-icon,
+html.theme-transition .theme-toggle-core,
+html.theme-transition .theme-toggle-cutout,
+html.theme-transition .theme-toggle-rays {
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease !important;
+}
+
+
+/* ========================================================= */
+/* DARK THEME                                                */
+/* Neutral graphite surfaces, same cyan/teal accents         */
+/* ========================================================= */
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --d-bg: #121417;
+  --d-surface: #1b1e23;
+  --d-surface-2: #23272d;
+  --d-text: #d3d8de;
+  --d-heading: #e8ecf0;
+  --d-muted: #adb5bf;
+  --d-line: rgba(255, 255, 255, 0.10);
+  --d-teal: #4fc3cc;
+  --d-teal-soft: #66bfbf;
+  --d-shadow: 0px 5px 25px 0px rgba(0, 0, 0, 0.55);
+  --d-shadow-soft: 0px 5px 20px rgba(0, 0, 0, 0.5);
+
+  background-color: var(--d-bg);
+}
+
+html[data-theme="dark"] body {
+  color: var(--d-text);
+}
+
+/* --- Base typography & links ---
+   :where() keeps these at the same specificity as the plain `a` / `h3`
+   rules, so every class-based colour (nav, buttons, credits...) still wins. */
+:where(html[data-theme="dark"]) h3 { color: var(--d-teal); }
+:where(html[data-theme="dark"]) a { color: var(--d-teal); }
+:where(html[data-theme="dark"]) a:hover { color: #8be6e6; }
+html[data-theme="dark"] hr { border-color: rgba(79, 195, 204, 0.35); border-bottom: none; }
+
+/* --- Nav: identical behaviour to light mode (light text, cyan on hover) --- */
+html[data-theme="dark"] .topnav { box-shadow: 0 2px 14px rgba(0, 0, 0, 0.5); }
+
+/* --- Footer --- */
+html[data-theme="dark"] footer {
+  background-color: #181b1f;
+  border-top: 1px solid rgba(102, 191, 191, 0.35);
+}
+html[data-theme="dark"] .copyright-text { color: #c8cfd7; }
+html[data-theme="dark"] .footer-icon-link:hover { background-color: rgba(255, 255, 255, 0.10); }
+
+/* --- Home --- */
+html[data-theme="dark"] .profile-pic,
+html[data-theme="dark"] .about-me-photo { box-shadow: var(--d-shadow-soft); }
+html[data-theme="dark"] .profile-pic:hover,
+html[data-theme="dark"] .about-me-photo:hover { box-shadow: 0px 8px 28px rgba(0, 0, 0, 0.65); }
+/* html[data-theme="dark"] .skill-row img { box-shadow: 0 2px 12px rgba(0, 0, 0, 0.45); } */
+
+/* --- Cow section --- */
+html[data-theme="dark"] .cow-subtitle,
+html[data-theme="dark"] .cow-caption { color: var(--d-text); }
+html[data-theme="dark"] .cow-stage {
+  background: var(--d-surface);
+  box-shadow: var(--d-shadow);
+}
+html[data-theme="dark"] .cow-overlay-text { color: rgba(127, 224, 224, 0.65); }
+html[data-theme="dark"] .cow-btn { box-shadow: 0 3px 14px rgba(0, 0, 0, 0.5); }
+html[data-theme="dark"] .cow-btn:hover { box-shadow: 0 6px 20px rgba(48, 227, 203, 0.28); }
+html[data-theme="dark"] .cow-explanation-header,
+html[data-theme="dark"] .cow-explanation-body { background: var(--d-surface); color: var(--d-text); }
+html[data-theme="dark"] .cow-explanation-title { color: var(--d-teal); }
+
+/* --- Stickman guide --- */
+html[data-theme="dark"] .guide-rope-ring { fill: var(--d-surface); }
+html[data-theme="dark"] .guide-head { fill: var(--d-bg); stroke: #d8dce1; }
+html[data-theme="dark"] .guide-line { stroke: #d8dce1; }
+html[data-theme="dark"] .guide-joint { fill: #d8dce1; }
+html[data-theme="dark"] .guide-floor-line { filter: drop-shadow(0 5px 10px rgba(79, 195, 204, 0.4)); }
+html[data-theme="dark"] .guide-bubble {
+  background-color: var(--d-surface);
+  color: var(--d-text);
+  box-shadow: var(--d-shadow);
+}
+html[data-theme="dark"] .guide-bubble::before { background-color: var(--d-surface); }
+html[data-theme="dark"] .guide-close { color: var(--d-text); }
+html[data-theme="dark"] .guide-close:hover { color: var(--d-teal); }
+
+/* --- About me --- */
+html[data-theme="dark"] .about-me-title { color: var(--d-teal-soft); }
+html[data-theme="dark"] .about-me-subtitle,
+html[data-theme="dark"] .about-me-text p { color: var(--d-text); }
+html[data-theme="dark"] .about-me-text a { color: var(--d-teal); }
+html[data-theme="dark"] .about-highlight {
+  background-color: var(--d-surface);
+  box-shadow: var(--d-shadow);
+}
+html[data-theme="dark"] .about-atom-orbit { stroke: #4fa9ae; opacity: 0.75; }
+html[data-theme="dark"] .about-electron { fill: #66d9dc; }
+html[data-theme="dark"] .about-nucleus-neck { fill: #8aa9b0; }
+html[data-theme="dark"] .about-ground-line { fill: var(--d-teal-soft); opacity: 0.3; }
+html[data-theme="dark"] .about-stick-head { fill: var(--d-surface); stroke: #d8dce1; }
+html[data-theme="dark"] .about-stick-line { stroke: #d8dce1; }
+html[data-theme="dark"] .about-stick-joint { fill: #d8dce1; }
+html[data-theme="dark"] .concept-link { color: var(--d-teal); }
+html[data-theme="dark"] .concept-link:hover { color: #8be6e6; background-color: rgba(102, 191, 191, 0.18); }
+
+/* --- Timeline --- */
+html[data-theme="dark"] .about-horizontal-timeline-single {
+  background: var(--d-surface);
+  box-shadow: var(--d-shadow);
+}
+html[data-theme="dark"] .timeline-axis { background-color: rgba(255, 255, 255, 0.22); }
+html[data-theme="dark"] .timeline-axis-labels span { color: var(--d-text); }
+html[data-theme="dark"] .timeline-axis-labels span::before { background-color: rgba(255, 255, 255, 0.08); }
+html[data-theme="dark"] .timeline-item-content strong { color: var(--d-heading); }
+html[data-theme="dark"] .timeline-item-content p { color: var(--d-muted); }
+html[data-theme="dark"] a.timeline-item:focus-visible { outline-color: var(--d-teal); }
+
+/* --- Blog index --- */
+html[data-theme="dark"] .blog-heading h3 { color: var(--d-heading); }
+html[data-theme="dark"] .blog-box {
+  background-color: var(--d-surface);
+  border-color: var(--d-line);
+  box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.4);
+}
+html[data-theme="dark"] .blog-box a:hover { background-color: var(--d-surface); }
+html[data-theme="dark"] .blog-text .blog-title { color: var(--d-heading); }
+html[data-theme="dark"] .blog-text .blog-title:hover { color: var(--d-teal); }
+html[data-theme="dark"] .blog-text p { color: var(--d-muted); }
+html[data-theme="dark"] .blog-text a { color: var(--d-text); }
+html[data-theme="dark"] .blog-text a:hover { color: var(--d-teal); }
+html[data-theme="dark"] .blog-img img {background-color: #ffffff;}
+
+/* --- Blog articles (pages not uploaded, but they share these classes) --- */
+html[data-theme="dark"] .blog-article-header h1 { color: var(--d-heading); }
+html[data-theme="dark"] .book-title-link a { color: var(--d-heading); }
+html[data-theme="dark"] .book-box a:hover { color: var(--d-teal); }
+html[data-theme="dark"] .book-box p,
+html[data-theme="dark"] .bimr-text-container p { color: var(--d-text); }
+html[data-theme="dark"] .book-container hr { border-color: rgba(79, 195, 204, 0.35); border-bottom: none; }
+html[data-theme="dark"] .blog-figure-right figcaption { color: var(--d-muted); }
+html[data-theme="dark"] .theorem-box {
+  background-color: var(--d-surface);
+  box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.45);
+}
+html[data-theme="dark"] .theorem-box h4 { color: var(--d-teal); }
+
+/* --- CV --- */
+html[data-theme="dark"] .cv-pic { border-color: rgba(255, 255, 255, 0.85); }
+html[data-theme="dark"] .video-overlay { background-color: rgba(0, 0, 0, 0.05); }
+html[data-theme="dark"] .cv-section-title { color: var(--d-heading); }
+
+html[data-theme="dark"] .expandable-container {
+  background-color: var(--d-surface);
+  box-shadow: var(--d-shadow);
+}
+html[data-theme="dark"] .header { background-color: var(--d-surface); }
+html[data-theme="dark"] .description { background-color: var(--d-surface); color: var(--d-text); }
+html[data-theme="dark"] .date { color: var(--d-heading); }
+html[data-theme="dark"] .title h2 { color: var(--d-heading); }
+html[data-theme="dark"] .institution,
+html[data-theme="dark"] .location { color: #c8cfd7; }
+html[data-theme="dark"] .affiliation-line,
+html[data-theme="dark"] .affiliation-separator { color: var(--d-muted); }
+html[data-theme="dark"] .affiliation-line .ens-link,
+html[data-theme="dark"] .affiliation-line .dauphine-link { color: var(--d-muted); }
+html[data-theme="dark"] .affiliation-line .ens-link:hover { color: #ffde00; background-color: #5f259f; }
+html[data-theme="dark"] .affiliation-line .dauphine-link:hover { color: #ffffff; background-color: #2e4588; }
+html[data-theme="dark"] .short-desc,
+html[data-theme="dark"] .additional-info,
+html[data-theme="dark"] .ects,
+html[data-theme="dark"] .gpa,
+html[data-theme="dark"] .stat-value,
+html[data-theme="dark"] .full-desc b,
+html[data-theme="dark"] .progress-container p { color: var(--d-text); }
+html[data-theme="dark"] .stat-value.accent { color: var(--d-teal); }
+html[data-theme="dark"] .stat { border-left-color: var(--d-line); }
+html[data-theme="dark"] .stat-label { color: var(--d-muted); }
+html[data-theme="dark"] .thesis-card {
+  background-color: var(--d-surface-2);
+  border-color: var(--d-line);
+}
+html[data-theme="dark"] .thesis-card h3 { color: var(--d-heading); }
+html[data-theme="dark"] .progress-bar { background-color: #2e3238; }
+html[data-theme="dark"] .circle-bg { stroke: #2e3238; }
+html[data-theme="dark"] .language-label { color: var(--d-text); }
+html[data-theme="dark"] .circle-text { fill: var(--d-text); }
+
+/* --- Awards --- */
+html[data-theme="dark"] .award-box {
+  background-color: var(--d-surface);
+  border-color: var(--d-line);
+  box-shadow: var(--d-shadow);
+}
+html[data-theme="dark"] .award-img { background-color: var(--d-surface); }
+html[data-theme="dark"] .separator { background-color: var(--d-line); }
+html[data-theme="dark"] .award-text .award-title { color: var(--d-heading); }
+html[data-theme="dark"] .award-text b { color: var(--d-heading); }
+
+
+/* --- Navigation bar --- */
+/* Navigation uses the same graphite surface as the cards */
+html[data-theme="dark"] .topnav {
+  background-color: var(--d-surface);
+
+  /* A subtle separator instead of a heavy shadow */
+  box-shadow: inset 0 -1px 0 var(--d-line);
+}
+html[data-theme="dark"] .topnav a {
+  color: var(--d-text);
+}
+html[data-theme="dark"] .topnav a:hover {
+  color: var(--d-teal);
+  background-color: transparent;
+}
+html[data-theme="dark"] .topnav a.active {
+  color: var(--d-teal);
+  font-weight: 700;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 7px;
+}
+
+html[data-theme="dark"] .topnav a:focus-visible {
+  outline: 2px solid var(--d-teal);
+  outline-offset: 2px;
+}
