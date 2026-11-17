@@ -1,6 +1,146 @@
 document.addEventListener("DOMContentLoaded", () => {
+    /* ========================= */
+    /* Light / dark theme        */
+    /* ========================= */
+
+    const THEME_KEY = "theme";
+    const root = document.documentElement;
+
+    // Light theme uses "<name>_logo.<ext>" (the current files);
+    // dark theme uses "<name>_logo_dark.<ext>".
+    const LOGO_RE = /(_logo)(_dark)?(\.[a-z0-9]+)(\?.*)?$/i;
+
+    function readStoredTheme() {
+        try {
+            const stored = localStorage.getItem(THEME_KEY);
+            return stored === "dark" || stored === "light" ? stored : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function systemTheme() {
+        return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+    }
+
+    function currentTheme() {
+        return root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+    }
+
+    function swapLogos(theme) {
+        document.querySelectorAll("img").forEach(img => {
+            const src = img.getAttribute("src");
+            if (!src || !LOGO_RE.test(src)) return;
+
+            const next = src.replace(LOGO_RE, (m, logo, light, ext, query) =>
+                logo + (theme === "dark" ? "_dark" : "") + ext + (query || "")
+            );
+
+            if (next !== src) img.setAttribute("src", next);
+        });
+    }
+
+    function updateToggleA11y(theme) {
+        const btn = document.getElementById("theme-toggle");
+        if (!btn) return;
+        const label = theme === "dark" ? "Switch to light mode" : "Switch to dark mode";
+        btn.setAttribute("aria-label", label);
+        btn.setAttribute("title", label);
+        btn.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+    }
+
+    function applyTheme(theme) {
+        root.setAttribute("data-theme", theme);
+        swapLogos(theme);
+        updateToggleA11y(theme);
+        window.dispatchEvent(new CustomEvent("themechange", { detail: { theme } }));
+    }
+
+    function buildThemeToggle() {
+        const nav = document.querySelector(".topnav");
+        if (!nav || document.getElementById("theme-toggle")) return null;
+
+        const btn = document.createElement("button");
+        btn.id = "theme-toggle";
+        btn.className = "theme-toggle";
+        btn.type = "button";
+        btn.innerHTML = `
+            <svg class="theme-toggle-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <defs>
+                    <mask id="theme-toggle-mask">
+                        <rect x="-10" y="-10" width="44" height="44" fill="white"></rect>
+                        <circle class="theme-toggle-cutout" cx="30" cy="0" r="7" fill="black"></circle>
+                    </mask>
+                </defs>
+                <g mask="url(#theme-toggle-mask)">
+                    <circle class="theme-toggle-core" cx="12" cy="12" r="5" fill="currentColor"></circle>
+                </g>
+                <g class="theme-toggle-rays" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="12" y1="1.5" x2="12" y2="4"></line>
+                    <line x1="12" y1="20" x2="12" y2="22.5"></line>
+                    <line x1="1.5" y1="12" x2="4" y2="12"></line>
+                    <line x1="20" y1="12" x2="22.5" y2="12"></line>
+                    <line x1="4.6" y1="4.6" x2="6.4" y2="6.4"></line>
+                    <line x1="17.6" y1="17.6" x2="19.4" y2="19.4"></line>
+                    <line x1="4.6" y1="19.4" x2="6.4" y2="17.6"></line>
+                    <line x1="17.6" y1="6.4" x2="19.4" y2="4.6"></line>
+                </g>
+            </svg>
+        `;
+        nav.appendChild(btn);
+        return btn;
+    }
+
+    // Make sure the attribute exists even if the page has no inline init script.
+    if (!root.getAttribute("data-theme")) {
+        root.setAttribute("data-theme", readStoredTheme() || systemTheme());
+    }
+
+    const themeToggleButton = buildThemeToggle();
+    applyTheme(currentTheme());
+
+    let themeTransitionTimer = null;
+
+    if (themeToggleButton) {
+        themeToggleButton.addEventListener("click", () => {
+            const next = currentTheme() === "dark" ? "light" : "dark";
+
+            // Smooth cross-fade of every colour while the theme flips.
+            root.classList.add("theme-transition");
+            clearTimeout(themeTransitionTimer);
+            themeTransitionTimer = setTimeout(() => root.classList.remove("theme-transition"), 800);
+
+            // Brief pop + ripple on the button itself.
+            themeToggleButton.classList.remove("theme-toggle--pop");
+            void themeToggleButton.offsetWidth; // restart the animation
+            themeToggleButton.classList.add("theme-toggle--pop");
+            setTimeout(() => themeToggleButton.classList.remove("theme-toggle--pop"), 650);
+
+            applyTheme(next);
+
+            try {
+                localStorage.setItem(THEME_KEY, next);
+            } catch (e) { /* storage unavailable: theme just won't persist */ }
+        });
+    }
+
+    // Follow the OS setting live, but only until the visitor picks a theme themselves.
+    if (window.matchMedia) {
+        const media = window.matchMedia("(prefers-color-scheme: dark)");
+        const onSystemChange = e => {
+            if (readStoredTheme()) return;
+            root.classList.add("theme-transition");
+            clearTimeout(themeTransitionTimer);
+            themeTransitionTimer = setTimeout(() => root.classList.remove("theme-transition"), 800);
+            applyTheme(e.matches ? "dark" : "light");
+        };
+        if (media.addEventListener) media.addEventListener("change", onSystemChange);
+    }
+
     document.getElementById("year").textContent = new Date().getFullYear();
-    
+
     // Toggle button functionality for expandable containers
     document.querySelectorAll(".toggle-button").forEach(button => {
         button.addEventListener("click", function () {

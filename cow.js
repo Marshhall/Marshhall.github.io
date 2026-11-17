@@ -336,6 +336,13 @@
   // ── Draw ──────────────────────────────────────────────────────────────────
   const bkt = [[], [], [], []];
 
+  // Theme palettes as [r, g, b, a]. The dark background matches .cow-stage in styles.css.
+  const BG_LIGHT   = [255, 255, 255, 1];
+  const BG_DARK    = [27, 30, 35, 1];
+  const COLS_LIGHT = [[17,153,158,0.20], [17,153,158,0.45], [17,153,158,0.72], [15,120,125,0.95]];
+  const COLS_DARK  = [[102,191,191,0.22], [102,191,191,0.48], [127,214,214,0.75], [176,240,238,0.95]];
+  let themeMix = document.documentElement.getAttribute("data-theme") === "dark" ? 1 : 0;
+
   function draw(now) {
     bkt[0].length = bkt[1].length = bkt[2].length = bkt[3].length = 0;
     const FOV = 800, cx = W / 2, cy = H / 2;
@@ -351,10 +358,20 @@
       bkt[lum < 0.32 ? 0 : lum < 0.50 ? 1 : lum < 0.68 ? 2 : 3].push(i);
     }
 
-    ctx.fillStyle = "#ffffff";
+    // Ease toward the active theme so the canvas fades in step with the CSS transition.
+    const themeTarget = document.documentElement.getAttribute("data-theme") === "dark" ? 1 : 0;
+    themeMix += (themeTarget - themeMix) * 0.09;
+    if (Math.abs(themeTarget - themeMix) < 0.002) themeMix = themeTarget;
+
+    const mixRGBA = (a, b) => {
+      const c = a.map((v, k) => v + (b[k] - v) * themeMix);
+      return `rgba(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])},${c[3].toFixed(3)})`;
+    };
+
+    ctx.fillStyle = mixRGBA(BG_LIGHT, BG_DARK);
     ctx.fillRect(0, 0, W, H);
 
-    const cols = ["rgba(17,153,158,0.20)", "rgba(17,153,158,0.45)", "rgba(17,153,158,0.72)", "rgba(15,120,125,0.95)"];
+    const cols = COLS_LIGHT.map((c, k) => mixRGBA(c, COLS_DARK[k]));
     const rads = [0.42, 0.50, 0.62, 0.80];
     for (let b = 0; b < 4; b++) {
       if (!bkt[b].length) continue;
