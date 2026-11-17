@@ -1929,7 +1929,7 @@ footer {
 } */
 
 .psl-container .psl-logo {
-  max-height: 90px;
+  max-height: 70px;
 }
 
 .date-logo {
@@ -1952,11 +1952,12 @@ footer {
 }
 
 .institution-logo {
-  height: auto;
   display: block;
+  width: auto;
+  height: auto;
+  max-width: min(250px, 100%);
+  max-height: 70px;
   object-fit: contain;
-  max-width: 300px;
-  max-height: 80px;
   margin-bottom: 5px;
   padding: 1px;
 }
