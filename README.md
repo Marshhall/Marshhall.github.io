@@ -5,3 +5,5 @@ A little corner for my physics, maths, and coding adventures, along with some pr
 Come for the CV, stay for the spherical (or even toroidal!) cow. 🐄 → 🍩🍩🍩
 
 [Take a look around →](https://marshhall.github.io/)
+
+© Marçal H. B. All rights reserved.
