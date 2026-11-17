@@ -1409,7 +1409,7 @@ footer {
 .topnav a:hover {
   color: #30e3cb;
   transition: all ease 0.3s;
-  background-color: #333;
+  background-color: transparent;
 }
 
 .topnav a.active {
@@ -2851,7 +2851,7 @@ html[data-theme="dark"] .theorem-box h4 { color: var(--d-teal); }
 
 /* --- CV --- */
 html[data-theme="dark"] .cv-pic { border-color: rgba(255, 255, 255, 0.85); }
-html[data-theme="dark"] .video-overlay { background-color: rgba(0, 0, 0, 0.10); }
+html[data-theme="dark"] .video-overlay { background-color: rgba(0, 0, 0, 0.05); }
 html[data-theme="dark"] .cv-section-title { color: var(--d-heading); }
 
 html[data-theme="dark"] .expandable-container {
