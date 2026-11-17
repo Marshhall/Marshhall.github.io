@@ -2682,9 +2682,9 @@ html[data-theme="dark"] {
   --d-bg: #121417;
   --d-surface: #1b1e23;
   --d-surface-2: #23272d;
-  --d-text: #d3d8de;
-  --d-heading: #eef1f4;
-  --d-muted: #9ba3ad;
+  --d-text: #e8ecf0;     /* was #d3d8de */
+  --d-heading: #f8fafb;  /* was #eef1f4 */
+  --d-muted: #bcc4cd;    /* was #9ba3ad */
   --d-line: rgba(255, 255, 255, 0.10);
   --d-teal: #4fc3cc;
   --d-teal-soft: #66bfbf;
@@ -2695,7 +2695,6 @@ html[data-theme="dark"] {
 }
 
 html[data-theme="dark"] body {
-  background-color: var(--d-bg);
   color: var(--d-text);
 }
 
@@ -2715,7 +2714,7 @@ html[data-theme="dark"] footer {
   background-color: #181b1f;
   border-top: 1px solid rgba(102, 191, 191, 0.35);
 }
-html[data-theme="dark"] .copyright-text { color: #aeb6bf; }
+html[data-theme="dark"] .copyright-text { color: #c8cfd7; }
 html[data-theme="dark"] .footer-icon-link:hover { background-color: rgba(255, 255, 255, 0.10); }
 
 /* --- Home --- */
@@ -2723,7 +2722,7 @@ html[data-theme="dark"] .profile-pic,
 html[data-theme="dark"] .about-me-photo { box-shadow: var(--d-shadow-soft); }
 html[data-theme="dark"] .profile-pic:hover,
 html[data-theme="dark"] .about-me-photo:hover { box-shadow: 0px 8px 28px rgba(0, 0, 0, 0.65); }
-html[data-theme="dark"] .skill-row img { box-shadow: 0 2px 12px rgba(0, 0, 0, 0.45); }
+/* html[data-theme="dark"] .skill-row img { box-shadow: 0 2px 12px rgba(0, 0, 0, 0.45); } */
 
 /* --- Cow section --- */
 html[data-theme="dark"] .cow-subtitle,
@@ -2798,6 +2797,7 @@ html[data-theme="dark"] .blog-text .blog-title:hover { color: var(--d-teal); }
 html[data-theme="dark"] .blog-text p { color: var(--d-muted); }
 html[data-theme="dark"] .blog-text a { color: var(--d-text); }
 html[data-theme="dark"] .blog-text a:hover { color: var(--d-teal); }
+html[data-theme="dark"] .blog-img img {background-color: #ffffff;}
 
 /* --- Blog articles (pages not uploaded, but they share these classes) --- */
 html[data-theme="dark"] .blog-article-header h1 { color: var(--d-heading); }
@@ -2815,7 +2815,7 @@ html[data-theme="dark"] .theorem-box h4 { color: var(--d-teal); }
 
 /* --- CV --- */
 html[data-theme="dark"] .cv-pic { border-color: rgba(255, 255, 255, 0.85); }
-html[data-theme="dark"] .video-overlay { background-color: rgba(10, 11, 14, 0.55); }
+html[data-theme="dark"] .video-overlay { background-color: rgba(0, 0, 0, 0.10); }
 html[data-theme="dark"] .cv-section-title { color: var(--d-heading); }
 
 html[data-theme="dark"] .expandable-container {
@@ -2827,7 +2827,7 @@ html[data-theme="dark"] .description { background-color: var(--d-surface); color
 html[data-theme="dark"] .date { color: var(--d-heading); }
 html[data-theme="dark"] .title h2 { color: var(--d-heading); }
 html[data-theme="dark"] .institution,
-html[data-theme="dark"] .location { color: #aeb6bf; }
+html[data-theme="dark"] .location { color: #c8cfd7; }
 html[data-theme="dark"] .affiliation-line,
 html[data-theme="dark"] .affiliation-separator { color: var(--d-muted); }
 html[data-theme="dark"] .affiliation-line .ens-link,
