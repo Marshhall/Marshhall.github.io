@@ -1955,7 +1955,7 @@ footer {
   display: block;
   width: auto;
   height: auto;
-  max-width: min(250px, 100%);
+  max-width: min(270px, 100%);
   max-height: 70px;
   object-fit: contain;
   margin-bottom: 5px;
